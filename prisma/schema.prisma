@@ -90,7 +90,7 @@ model Order {
   createdAt       DateTime @db.Date
   customerId      String   @db.ObjectId
   number          String   @unique
-  shippingAddress String
+  shippingAddress Json
   status          String
   paymentStatus   String   @default("PENDING")
   storeId         String   @db.ObjectId
