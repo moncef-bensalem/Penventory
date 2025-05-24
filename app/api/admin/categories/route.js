@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
+import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { PrismaClient } from '@prisma/client';
 
@@ -9,11 +9,11 @@ const prisma = new PrismaClient();
  * Route pour récupérer toutes les catégories avec des informations détaillées pour l'administrateur
  * Inclut les informations sur les vendeurs et les produits associés à chaque catégorie
  */
-export async function GET(request) {
+export async function GET() {
   try {
     console.log('[ADMIN_CATEGORIES_GET] Vérification de l\'authentification admin...');
     
-    const session = await getServerSession(authOptions, request);
+    const session = await getServerSession(authOptions);
     
     // Vérifier si l'utilisateur est connecté et est un administrateur
     if (!session?.user || session.user.role !== 'ADMIN') {
@@ -72,7 +72,7 @@ export async function POST(request) {
   try {
     console.log('[ADMIN_CATEGORIES_POST] Vérification de l\'authentification admin...');
     
-    const session = await getServerSession(authOptions, request);
+    const session = await getServerSession(authOptions);
     
     // Vérifier si l'utilisateur est connecté et est un administrateur
     if (!session?.user || session.user.role !== 'ADMIN') {
