@@ -15,9 +15,9 @@ function handleBigInt(data) {
 }
 
 // Vérification de l'autorisation admin
-async function checkAdminAuth() {
+async function checkAdminAuth(request) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions, request);
     if (!session || session.user.role !== 'ADMIN') {
       return false;
     }
@@ -28,12 +28,12 @@ async function checkAdminAuth() {
   }
 }
 
-export async function GET() {
+export async function GET(request) {
   try {
     console.log('[ADMIN_DASHBOARD_GET] Démarrage de la requête...');
     
     // Vérifier l'authentification
-    const auth = await checkAdminAuth();
+    const auth = await checkAdminAuth(request);
     if (!auth && process.env.NODE_ENV === 'production') {
       return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
     }
