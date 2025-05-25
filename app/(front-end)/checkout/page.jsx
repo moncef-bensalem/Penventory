@@ -5,7 +5,7 @@ import Steps from '@/components/Checkout/Steps';
 import React from 'react';
 import { CartProvider } from '@/context/cart-context';
 import { CheckoutProvider } from '@/context/checkout-context';
-import { useSession } from 'next-auth/react';
+// Authentication is handled by the AuthProvider in the root layout
 
 export default function Page() {
     const steps = [
