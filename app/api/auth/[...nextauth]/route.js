@@ -160,6 +160,9 @@ export const authOptions = {
         if (token?.role === 'SELLER') {
           return '/seller/dashboard';
         }
+        if (token?.role === 'MANAGER') {
+          return '/manager/dashboard';
+        }
         return '/dashboard';
       }
       return url;
