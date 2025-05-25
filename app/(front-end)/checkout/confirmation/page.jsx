@@ -1,16 +1,142 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { CheckCircle, Package, Calendar, Printer, ArrowLeft, ShoppingBag } from 'lucide-react';
+import { CheckCircle, Package, Calendar, Printer, ArrowLeft, ShoppingBag, Phone, Mail, MapPin } from 'lucide-react';
 
-export default function OrderConfirmationPage() {
+// Composant de facture
+function Invoice({ orderDetails }) {
+  if (!orderDetails) return null;
+  
+  // Utiliser la première boutique comme boutique principale pour l'en-tête
+  const mainStore = orderDetails.stores && orderDetails.stores.length > 0 
+    ? orderDetails.stores[0] 
+    : { name: 'Marketplace', address: 'Adresse non disponible', city: 'Tunis', country: 'Tunisie', email: 'contact@marketplace.com', phone: '' };
+  
+  return (
+    <div className="invoice-container p-8 max-w-4xl mx-auto bg-white">
+      {/* En-tête de la facture */}
+      <div className="flex justify-between items-start mb-8 border-b pb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">FACTURE</h1>
+          <p className="text-gray-600">N° {orderDetails.orderNumber || orderDetails.id}</p>
+          <p className="text-gray-600">Date: {new Date(orderDetails.date).toLocaleDateString('fr-FR')}</p>
+        </div>
+        <div className="text-right">
+          <h2 className="text-xl font-bold text-gray-900 mb-1">{mainStore.name}</h2>
+          <p className="text-gray-600">{mainStore.address}</p>
+          <p className="text-gray-600">{mainStore.postalCode} {mainStore.city}, {mainStore.country}</p>
+          <p className="text-gray-600">{mainStore.email}</p>
+          {mainStore.phone && <p className="text-gray-600">{mainStore.phone}</p>}
+        </div>
+      </div>
+      
+      {/* Informations client */}
+      <div className="mb-8 border-b pb-6">
+        <h2 className="text-lg font-bold text-gray-900 mb-3">Informations client</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <h3 className="font-semibold text-gray-900">Facturation</h3>
+            <p className="text-gray-600">{orderDetails.shippingAddress.name}</p>
+            <p className="text-gray-600">{orderDetails.shippingAddress.address}</p>
+            <p className="text-gray-600">{orderDetails.shippingAddress.postalCode}, {orderDetails.shippingAddress.city}</p>
+            <p className="text-gray-600">{orderDetails.shippingAddress.country}</p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">Livraison</h3>
+            <p className="text-gray-600">{orderDetails.shippingAddress.name}</p>
+            <p className="text-gray-600">{orderDetails.shippingAddress.address}</p>
+            <p className="text-gray-600">{orderDetails.shippingAddress.postalCode}, {orderDetails.shippingAddress.city}</p>
+            <p className="text-gray-600">{orderDetails.shippingAddress.country}</p>
+          </div>
+        </div>
+      </div>
+      
+      {/* Détails de la commande par boutique */}
+      <div className="mb-8">
+        <h2 className="text-lg font-bold text-gray-900 mb-3">Détails de la commande</h2>
+        
+        {orderDetails.stores && orderDetails.stores.map((store, storeIndex) => (
+          <div key={store.id} className={`mb-6 ${storeIndex > 0 ? 'mt-8 pt-6 border-t border-gray-200' : ''}`}>
+            <h3 className="font-semibold text-gray-900 mb-3">Boutique: {store.name}</h3>
+            
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-gray-300">
+                  <th className="py-2 text-left text-gray-900">Produit</th>
+                  <th className="py-2 text-center text-gray-900">Quantité</th>
+                  <th className="py-2 text-center text-gray-900">Prix unitaire</th>
+                  <th className="py-2 text-center text-gray-900">Remise</th>
+                  <th className="py-2 text-right text-gray-900">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {store.items.map((item) => {
+                  const unitPrice = item.price;
+                  const discountedPrice = unitPrice * (1 - item.discount / 100);
+                  const totalPrice = discountedPrice * item.quantity;
+                  
+                  return (
+                    <tr key={item.id} className="border-b border-gray-200">
+                      <td className="py-3 text-left text-gray-900">{item.name}</td>
+                      <td className="py-3 text-center text-gray-900">{item.quantity}</td>
+                      <td className="py-3 text-center text-gray-900">{unitPrice.toFixed(2)} DT</td>
+                      <td className="py-3 text-center text-gray-900">{item.discount > 0 ? `${item.discount}%` : '-'}</td>
+                      <td className="py-3 text-right text-gray-900">{totalPrice.toFixed(2)} DT</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            
+            {/* Coordonnées de la boutique */}
+            <div className="mt-2 text-sm text-gray-600">
+              <p>Contact: {store.email} {store.phone ? ` | ${store.phone}` : ''}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Résumé des coûts */}
+      <div className="mb-8 border-t pt-4">
+        <div className="flex justify-between mb-2">
+          <span className="text-gray-600">Sous-total</span>
+          <span className="text-gray-900">{orderDetails.subtotal.toFixed(2)} DT</span>
+        </div>
+        <div className="flex justify-between mb-2">
+          <span className="text-gray-600">Livraison</span>
+          <span className="text-gray-900">
+            {orderDetails.shipping === 0 ? 'Gratuite' : `${orderDetails.shipping.toFixed(2)} DT`}
+          </span>
+        </div>
+        <div className="flex justify-between mb-4">
+          <span className="text-gray-600">TVA (20%)</span>
+          <span className="text-gray-900">{orderDetails.tax.toFixed(2)} DT</span>
+        </div>
+        <div className="flex justify-between pt-4 border-t border-gray-300">
+          <span className="font-bold text-gray-900">Total</span>
+          <span className="font-bold text-gray-900">{orderDetails.total.toFixed(2)} DT</span>
+        </div>
+      </div>
+      
+      {/* Pied de page */}
+      <div className="text-center text-gray-600 text-sm mt-12 pt-6 border-t">
+        <p>Merci pour votre commande!</p>
+        <p>Pour toute question concernant cette facture, veuillez contacter notre service client.</p>
+        <p className="mt-2">VOTRE BOUTIQUE - SIRET: 123 456 789 00012 - TVA: FR12345678900</p>
+      </div>
+    </div>
+  );
+}
+
+function OrderConfirmationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get('orderId');
   
   const [orderDetails, setOrderDetails] = useState(null);
+  const invoiceRef = useRef(null);
   
   useEffect(() => {
     if (!orderId) {
@@ -50,7 +176,39 @@ export default function OrderConfirmationPage() {
         total + (item.price * (1 - (item.discount || 0) / 100) * item.quantity), 0);
       const shipping = subtotal > 30 ? 0 : 4.99;
       const tax = subtotal * 0.2; // TVA 20%
-      const total = subtotal + shipping;
+      const total = subtotal + shipping + tax; // Inclure la TVA dans le total
+      
+      // Regrouper les articles par boutique
+      const itemsByStore = {};
+      cartItems.forEach(item => {
+        const storeId = item.storeId || 'unknown';
+        const storeName = item.storeName || 'Boutique';
+        
+        if (!itemsByStore[storeId]) {
+          itemsByStore[storeId] = {
+            id: storeId,
+            name: storeName,
+            logo: item.storeLogo || null,
+            address: item.storeAddress || 'Adresse non disponible',
+            city: item.storeCity || 'Ville non disponible',
+            postalCode: item.storePostalCode || '',
+            country: item.storeCountry || 'Tunisie',
+            email: item.storeEmail || 'contact@boutique.com',
+            phone: item.storePhone || '',
+            items: []
+          };
+        }
+        
+        itemsByStore[storeId].items.push({
+          id: item.id,
+          name: item.name || 'Produit',
+          price: Number(item.price) || 0,
+          quantity: Number(item.quantity) || 1,
+          discount: Number(item.discount) || 0,
+          image: Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : 
+                 (item.image || 'https://placehold.co/600x600/orange/white?text=Produit')
+        });
+      });
       
       // Créer l'objet détails de commande
       const orderData = {
@@ -58,12 +216,15 @@ export default function OrderConfirmationPage() {
         orderNumber: orderNumber, // Utiliser le numéro formaté
         date: new Date().toISOString(),
         status: 'confirmed',
+        stores: Object.values(itemsByStore),
         items: cartItems.map(item => ({
           id: item.id,
           name: item.name || 'Produit',
           price: Number(item.price) || 0,
           quantity: Number(item.quantity) || 1,
           discount: Number(item.discount) || 0,
+          storeId: item.storeId || 'unknown',
+          storeName: item.storeName || 'Boutique',
           image: Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : 
                  (item.image || 'https://placehold.co/600x600/orange/white?text=Produit')
         })),
@@ -261,14 +422,177 @@ export default function OrderConfirmationPage() {
             Suivre ma commande
           </Link>
           <button 
-            onClick={() => window.print()}
+            onClick={() => {
+              // Créer une nouvelle fenêtre pour l'impression
+              const printWindow = window.open('', '_blank', 'width=800,height=600');
+              printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                  <title>Facture - Commande ${orderDetails.orderNumber || orderDetails.id}</title>
+                  <meta charset="UTF-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+                  <style>
+                    @media print {
+                      body {
+                        print-color-adjust: exact;
+                        -webkit-print-color-adjust: exact;
+                      }
+                      @page {
+                        size: A4;
+                        margin: 0.5cm;
+                      }
+                    }
+                    body {
+                      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                    }
+                  </style>
+                </head>
+                <body>
+                  <div class="invoice-container p-8 max-w-4xl mx-auto bg-white">
+                    <!-- En-tête de la facture -->
+                    <div class="flex justify-between items-start mb-8 border-b pb-6">
+                      <div>
+                        <h1 class="text-2xl font-bold text-gray-900 mb-1">FACTURE</h1>
+                        <p class="text-gray-600">N° ${orderDetails.orderNumber || orderDetails.id}</p>
+                        <p class="text-gray-600">Date: ${new Date(orderDetails.date).toLocaleDateString('fr-FR')}</p>
+                      </div>
+                      <div class="text-right">
+                        <h2 class="text-xl font-bold text-gray-900 mb-1">${orderDetails.stores && orderDetails.stores.length > 0 ? orderDetails.stores[0].name : 'Marketplace'}</h2>
+                        <p class="text-gray-600">${orderDetails.stores && orderDetails.stores.length > 0 ? orderDetails.stores[0].address : 'Adresse non disponible'}</p>
+                        <p class="text-gray-600">${orderDetails.stores && orderDetails.stores.length > 0 ? `${orderDetails.stores[0].postalCode} ${orderDetails.stores[0].city}, ${orderDetails.stores[0].country}` : 'Tunis, Tunisie'}</p>
+                        <p class="text-gray-600">${orderDetails.stores && orderDetails.stores.length > 0 ? orderDetails.stores[0].email : 'contact@marketplace.com'}</p>
+                        ${orderDetails.stores && orderDetails.stores.length > 0 && orderDetails.stores[0].phone ? `<p class="text-gray-600">${orderDetails.stores[0].phone}</p>` : ''}
+                      </div>
+                    </div>
+                    
+                    <!-- Informations client -->
+                    <div class="mb-8 border-b pb-6">
+                      <h2 class="text-lg font-bold text-gray-900 mb-3">Informations client</h2>
+                      <div class="grid grid-cols-2 gap-4">
+                        <div>
+                          <h3 class="font-semibold text-gray-900">Facturation</h3>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.name}</p>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.address}</p>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.postalCode}, ${orderDetails.shippingAddress.city}</p>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.country}</p>
+                        </div>
+                        <div>
+                          <h3 class="font-semibold text-gray-900">Livraison</h3>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.name}</p>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.address}</p>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.postalCode}, ${orderDetails.shippingAddress.city}</p>
+                          <p class="text-gray-600">${orderDetails.shippingAddress.country}</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Détails de la commande par boutique -->
+                    <div class="mb-8">
+                      <h2 class="text-lg font-bold text-gray-900 mb-3">Détails de la commande</h2>
+                      
+                      ${orderDetails.stores && orderDetails.stores.map((store, storeIndex) => `
+                        <div class="${storeIndex > 0 ? 'mt-8 pt-6 border-t border-gray-200' : ''} mb-6">
+                          <h3 class="font-semibold text-gray-900 mb-3">Boutique: ${store.name}</h3>
+                          
+                          <table class="w-full border-collapse">
+                            <thead>
+                              <tr class="border-b-2 border-gray-300">
+                                <th class="py-2 text-left text-gray-900">Produit</th>
+                                <th class="py-2 text-center text-gray-900">Quantité</th>
+                                <th class="py-2 text-center text-gray-900">Prix unitaire</th>
+                                <th class="py-2 text-center text-gray-900">Remise</th>
+                                <th class="py-2 text-right text-gray-900">Total</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              ${store.items.map(item => {
+                                const unitPrice = item.price;
+                                const discountedPrice = unitPrice * (1 - item.discount / 100);
+                                const totalPrice = discountedPrice * item.quantity;
+                                
+                                return `
+                                  <tr class="border-b border-gray-200">
+                                    <td class="py-3 text-left text-gray-900">${item.name}</td>
+                                    <td class="py-3 text-center text-gray-900">${item.quantity}</td>
+                                    <td class="py-3 text-center text-gray-900">${unitPrice.toFixed(2)} DT</td>
+                                    <td class="py-3 text-center text-gray-900">${item.discount > 0 ? `${item.discount}%` : '-'}</td>
+                                    <td class="py-3 text-right text-gray-900">${totalPrice.toFixed(2)} DT</td>
+                                  </tr>
+                                `;
+                              }).join('')}
+                            </tbody>
+                          </table>
+                          
+                          <!-- Coordonnées de la boutique -->
+                          <div class="mt-2 text-sm text-gray-600">
+                            <p>Contact: ${store.email} ${store.phone ? ` | ${store.phone}` : ''}</p>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                    
+                    <!-- Résumé des coûts -->
+                    <div class="mb-8 border-t pt-4">
+                      <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Sous-total</span>
+                        <span class="text-gray-900">${orderDetails.subtotal.toFixed(2)} DT</span>
+                      </div>
+                      <div class="flex justify-between mb-2">
+                        <span class="text-gray-600">Livraison</span>
+                        <span class="text-gray-900">
+                          ${orderDetails.shipping === 0 ? 'Gratuite' : `${orderDetails.shipping.toFixed(2)} DT`}
+                        </span>
+                      </div>
+                      <div class="flex justify-between mb-4">
+                        <span class="text-gray-600">TVA (20%)</span>
+                        <span class="text-gray-900">${orderDetails.tax.toFixed(2)} DT</span>
+                      </div>
+                      <div class="flex justify-between pt-4 border-t border-gray-300">
+                        <span class="font-bold text-gray-900">Total</span>
+                        <span class="font-bold text-gray-900">${orderDetails.total.toFixed(2)} DT</span>
+                      </div>
+                    </div>
+                    
+                    <!-- Pied de page -->
+                    <div class="text-center text-gray-600 text-sm mt-12 pt-6 border-t">
+                      <p>Merci pour votre commande!</p>
+                      <p>Pour toute question concernant cette facture, veuillez contacter notre service client.</p>
+                      <p class="mt-2">VOTRE BOUTIQUE - SIRET: 123 456 789 00012 - TVA: FR12345678900</p>
+                    </div>
+                  </div>
+                  <script>
+                    // Imprimer automatiquement la facture
+                    window.onload = function() {
+                      setTimeout(function() {
+                        window.print();
+                        setTimeout(function() {
+                          window.close();
+                        }, 500);
+                      }, 500);
+                    };
+                  </script>
+                </body>
+                </html>
+              `);
+              printWindow.document.close();
+            }}
             className="bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-white py-3 px-6 rounded-md font-medium transition-colors flex items-center justify-center"
           >
             <Printer className="mr-2 h-5 w-5" />
-            Imprimer la confirmation
+            Imprimer la facture
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function OrderConfirmationPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Chargement...</div>}>
+      <OrderConfirmationContent />
+    </Suspense>
   );
 }
