@@ -13,9 +13,10 @@ export async function GET() {
       console.log('[ADMIN_SELLERS_GET] Session utilisateur:', session?.user?.email, 'Role:', session?.user?.role);
       
       // Pour le développement, permettre l'accès même sans authentification
-      if (!session?.user || session.user.role !== 'ADMIN') {
+      // EN PRODUCTION, autoriser ADMIN ET MANAGER
+      if (!session?.user || (process.env.NODE_ENV === 'production' && !['ADMIN', 'MANAGER'].includes(session.user.role))) {
         if (process.env.NODE_ENV === 'production') {
-          console.log('[ADMIN_SELLERS_GET] Accès non autorisé - Rôle requis: ADMIN, Rôle actuel:', session?.user?.role);
+          console.log('[ADMIN_SELLERS_GET] Accès non autorisé - Rôle(s) requis: ADMIN ou MANAGER, Rôle actuel:', session?.user?.role);
           return NextResponse.json({ error: 'Non autorisé' }, { status: 403 });
         } else {
           console.warn('[ADMIN_SELLERS_GET] Accès non autorisé ignoré en mode développement');

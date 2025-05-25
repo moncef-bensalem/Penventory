@@ -144,149 +144,234 @@ function OrderConfirmationContent() {
       return;
     }
     
-    // Récupérer les informations de commande stockées dans localStorage
-    try {
-      // On récupère le panier car c'est ce qui a été commandé
-      const cartItems = JSON.parse(localStorage.getItem('lastOrder') || '[]');
-      
-      // Récupérer les IDs MongoDB des commandes avec sécurité
-      let orderIds = [];
+    // Récupérer les informations de commande
+    const getOrderDetails = async () => {
       try {
+        // Essayer d'abord de récupérer depuis l'API
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
+        if (baseUrl) {
+          try {
+            const response = await fetch(`${baseUrl}/api/orders/${orderId}`);
+            if (response.ok) {
+              const data = await response.json();
+              if (data && data.order) {
+                const formattedOrder = formatApiOrderData(data.order);
+                setOrderDetails(formattedOrder);
+                return;
+              }
+            }
+          } catch (apiError) {
+            console.error('Erreur API:', apiError);
+            // Continuer avec les données locales en cas d'erreur
+          }
+        }
+        
+        // Fallback: utiliser les données du localStorage
+        const cartItems = JSON.parse(localStorage.getItem('lastOrder') || '[]');
+        
+        // Récupérer les IDs MongoDB des commandes
+        let orderIds = [];
         const orderIdsString = localStorage.getItem('orderIds');
         if (orderIdsString && orderIdsString.startsWith('[') && orderIdsString.endsWith(']')) {
           orderIds = JSON.parse(orderIdsString);
-        } else {
-          console.warn('Format incorrect des orderIds dans localStorage');
         }
-      } catch (parseError) {
-        console.error('Erreur lors du parsing des orderIds:', parseError);
-        // En cas d'erreur, on continue avec un tableau vide
+        
+        const currentOrderId = orderIds.length > 0 && orderIds[0].id ? orderIds[0].id : orderId;
+        const orderNumber = orderIds.length > 0 && orderIds[0].number ? orderIds[0].number : orderId;
+        
+        // Calculer les totaux
+        const subtotal = cartItems.reduce((total, item) => 
+          total + (item.price * (1 - (item.discount || 0) / 100) * item.quantity), 0);
+        const shipping = subtotal > 30 ? 0 : 4.99;
+        const tax = subtotal * 0.2; // TVA 20%
+        const total = subtotal + shipping + tax;
+        
+        // Regrouper les articles par boutique
+        const itemsByStore = {};
+        cartItems.forEach(item => {
+          const storeId = item.storeId || 'unknown';
+          const storeName = item.storeName || 'Boutique';
+          
+          if (!itemsByStore[storeId]) {
+            itemsByStore[storeId] = {
+              id: storeId,
+              name: storeName,
+              logo: item.storeLogo || null,
+              address: item.storeAddress || 'Adresse non disponible',
+              city: item.storeCity || 'Ville non disponible',
+              postalCode: item.storePostalCode || '',
+              country: item.storeCountry || 'Tunisie',
+              email: item.storeEmail || 'contact@boutique.com',
+              phone: item.storePhone || '',
+              items: []
+            };
+          }
+          
+          itemsByStore[storeId].items.push({
+            id: item.id,
+            name: item.name || 'Produit',
+            price: Number(item.price) || 0,
+            quantity: Number(item.quantity) || 1,
+            discount: Number(item.discount) || 0,
+            image: Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : 
+                   (item.image || 'https://placehold.co/600x600/orange/white?text=Produit')
+          });
+        });
+        
+        // Créer l'objet détails de commande
+        const orderData = {
+          id: currentOrderId,
+          orderNumber: orderNumber,
+          date: new Date().toISOString(),
+          status: 'confirmed',
+          stores: Object.values(itemsByStore),
+          items: cartItems.map(item => ({
+            id: item.id,
+            name: item.name || 'Produit',
+            price: Number(item.price) || 0,
+            quantity: Number(item.quantity) || 1,
+            discount: Number(item.discount) || 0,
+            storeId: item.storeId || 'unknown',
+            storeName: item.storeName || 'Boutique',
+            image: Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : 
+                   (item.image || 'https://placehold.co/600x600/orange/white?text=Produit')
+          })),
+          subtotal: subtotal,
+          shipping: shipping,
+          tax: tax,
+          total: total,
+          shippingAddress: {
+            name: localStorage.getItem('checkout_name') || '',
+            address: localStorage.getItem('checkout_address') || '',
+            city: localStorage.getItem('checkout_city') || '',
+            postalCode: localStorage.getItem('checkout_postalCode') || '',
+            country: localStorage.getItem('checkout_country') || '',
+            email: localStorage.getItem('checkout_email') || '',
+            phone: localStorage.getItem('checkout_phone') || ''
+          },
+          paymentMethod: localStorage.getItem('checkout_paymentMethod') || 'Carte bancaire',
+          estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
+        };
+        
+        setOrderDetails(orderData);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données de commande:', error);
+        
+        // En cas d'erreur, utiliser des données de secours
+        const mockOrderDetails = {
+          id: orderId,
+          orderNumber: orderId,
+          date: new Date().toISOString(),
+          status: 'confirmed',
+          items: [
+            {
+              id: 1,
+              name: 'Produit de secours',
+              price: 9.99,
+              quantity: 1,
+              discount: 0,
+              image: 'https://placehold.co/600x600/orange/white?text=Produit'
+            }
+          ],
+          subtotal: 9.99,
+          shipping: 0,
+          tax: 2.00,
+          total: 9.99,
+          shippingAddress: {
+            name: 'Client',
+            address: 'Adresse non disponible',
+            city: 'Ville',
+            postalCode: '00000',
+            country: 'France'
+          },
+          paymentMethod: 'Méthode de paiement',
+          estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
+        };
+        
+        setOrderDetails(mockOrderDetails);
       }
-      
-      const currentOrderId = orderIds.length > 0 && orderIds[0].id ? orderIds[0].id : orderId;
-      const orderNumber = orderIds.length > 0 && orderIds[0].number ? orderIds[0].number : orderId;
-      
-      // Si le panier est vide, on essaie de récupérer l'historique
-      if (!cartItems || cartItems.length === 0) {
-        console.log("Aucun article dans la dernière commande, utilisation de l'historique si disponible");
-      }
-      
-      // Calculer les totaux
-      const subtotal = cartItems.reduce((total, item) => 
-        total + (item.price * (1 - (item.discount || 0) / 100) * item.quantity), 0);
-      const shipping = subtotal > 30 ? 0 : 4.99;
-      const tax = subtotal * 0.2; // TVA 20%
-      const total = subtotal + shipping + tax; // Inclure la TVA dans le total
-      
-      // Regrouper les articles par boutique
+    };
+    
+    // Fonction pour formater les données de l'API
+    const formatApiOrderData = (apiOrder) => {
+      // Regrouper les articles par boutique si nécessaire
       const itemsByStore = {};
-      cartItems.forEach(item => {
-        const storeId = item.storeId || 'unknown';
-        const storeName = item.storeName || 'Boutique';
+      const items = apiOrder.items || [];
+      
+      items.forEach(item => {
+        const storeId = item.product?.storeId || apiOrder.storeId || 'unknown';
+        const storeName = item.product?.store?.name || 'Boutique';
         
         if (!itemsByStore[storeId]) {
           itemsByStore[storeId] = {
             id: storeId,
             name: storeName,
-            logo: item.storeLogo || null,
-            address: item.storeAddress || 'Adresse non disponible',
-            city: item.storeCity || 'Ville non disponible',
-            postalCode: item.storePostalCode || '',
-            country: item.storeCountry || 'Tunisie',
-            email: item.storeEmail || 'contact@boutique.com',
-            phone: item.storePhone || '',
+            logo: null,
+            address: 'Adresse non disponible',
+            city: 'Ville non disponible',
+            postalCode: '',
+            country: 'Tunisie',
+            email: 'contact@boutique.com',
+            phone: '',
             items: []
           };
         }
         
         itemsByStore[storeId].items.push({
-          id: item.id,
-          name: item.name || 'Produit',
+          id: item.productId,
+          name: item.product?.name || 'Produit',
           price: Number(item.price) || 0,
           quantity: Number(item.quantity) || 1,
-          discount: Number(item.discount) || 0,
-          image: Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : 
-                 (item.image || 'https://placehold.co/600x600/orange/white?text=Produit')
+          discount: 0, // Pas de remise dans l'API actuelle
+          image: item.product?.images?.[0] || 'https://placehold.co/600x600/orange/white?text=Produit'
         });
       });
       
-      // Créer l'objet détails de commande
-      const orderData = {
-        id: currentOrderId, // Utiliser l'ID MongoDB
-        orderNumber: orderNumber, // Utiliser le numéro formaté
-        date: new Date().toISOString(),
-        status: 'confirmed',
-        stores: Object.values(itemsByStore),
-        items: cartItems.map(item => ({
-          id: item.id,
-          name: item.name || 'Produit',
-          price: Number(item.price) || 0,
-          quantity: Number(item.quantity) || 1,
-          discount: Number(item.discount) || 0,
-          storeId: item.storeId || 'unknown',
-          storeName: item.storeName || 'Boutique',
-          image: Array.isArray(item.images) && item.images.length > 0 ? item.images[0] : 
-                 (item.image || 'https://placehold.co/600x600/orange/white?text=Produit')
-        })),
-        subtotal: subtotal,
-        shipping: shipping,
-        tax: tax,
-        total: total,
-        shippingAddress: {
-          name: localStorage.getItem('checkout_name') || 'Client',
-          address: localStorage.getItem('checkout_address') || '123 Rue de Paris',
-          city: localStorage.getItem('checkout_city') || 'Paris',
-          postalCode: localStorage.getItem('checkout_postalCode') || '75000',
-          country: localStorage.getItem('checkout_country') || 'France'
-        },
-        paymentMethod: localStorage.getItem('checkout_paymentMethod') || 'Carte bancaire',
-        estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
-      };
-      
-      setOrderDetails(orderData);
-      
-      // Vider le panier après la commande et stocker cette commande comme dernière commande
-      if (!localStorage.getItem('lastOrder')) {
-        localStorage.setItem('lastOrder', JSON.stringify(cartItems));
-        localStorage.setItem('cart', JSON.stringify([]));
+      // Convertir l'adresse de livraison si elle est au format JSON string
+      let shippingAddress = apiOrder.shippingAddress;
+      if (typeof shippingAddress === 'string') {
+        try {
+          shippingAddress = JSON.parse(shippingAddress);
+        } catch (e) {
+          shippingAddress = { address: shippingAddress };
+        }
       }
       
-    } catch (error) {
-      console.error('Erreur lors de la récupération des données de commande:', error);
-      
-      // En cas d'erreur, utiliser des données de secours
-      const mockOrderDetails = {
-        id: orderId,
-        orderNumber: orderId,
-        date: new Date().toISOString(),
-        status: 'confirmed',
-        items: [
-          {
-            id: 1,
-            name: 'Produit de secours',
-            price: 9.99,
-            quantity: 1,
-            discount: 0,
-            image: 'https://placehold.co/600x600/orange/white?text=Produit'
-          }
-        ],
-        subtotal: 9.99,
-        shipping: 0,
-        tax: 2.00,
-        total: 9.99,
-        shippingAddress: {
+      // Créer l'objet détails de commande formaté
+      return {
+        id: apiOrder.id,
+        orderNumber: apiOrder.number,
+        date: apiOrder.createdAt,
+        status: apiOrder.status,
+        stores: Object.values(itemsByStore),
+        items: items.map(item => ({
+          id: item.productId,
+          name: item.product?.name || 'Produit',
+          price: Number(item.price) || 0,
+          quantity: Number(item.quantity) || 1,
+          discount: 0,
+          storeId: item.product?.storeId || apiOrder.storeId || 'unknown',
+          storeName: item.product?.store?.name || 'Boutique',
+          image: item.product?.images?.[0] || 'https://placehold.co/600x600/orange/white?text=Produit'
+        })),
+        subtotal: apiOrder.subtotal || 0,
+        shipping: apiOrder.shipping || 0,
+        tax: apiOrder.tax || 0,
+        total: apiOrder.total || 0,
+        shippingAddress: shippingAddress || {
           name: 'Client',
           address: 'Adresse non disponible',
           city: 'Ville',
           postalCode: '00000',
-          country: 'France'
+          country: 'Tunisie'
         },
-        paymentMethod: 'Méthode de paiement',
-        estimatedDelivery: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
+        paymentMethod: apiOrder.paymentMethod || 'Carte bancaire',
+        estimatedDelivery: apiOrder.estimatedDelivery ? new Date(apiOrder.estimatedDelivery).toLocaleDateString('fr-FR') : 
+                           new Date(Date.now() + 4 * 24 * 60 * 60 * 1000).toLocaleDateString('fr-FR')
       };
-      
-      setOrderDetails(mockOrderDetails);
-    }
+    };
+    
+    getOrderDetails();
   }, [orderId, router]);
   
   if (!orderDetails) {
@@ -344,6 +429,8 @@ function OrderConfirmationContent() {
                   <p>{orderDetails.shippingAddress.address}</p>
                   <p>{orderDetails.shippingAddress.postalCode}, {orderDetails.shippingAddress.city}</p>
                   <p>{orderDetails.shippingAddress.country}</p>
+                  {orderDetails.shippingAddress.email && <p>Email: {orderDetails.shippingAddress.email}</p>}
+                  {orderDetails.shippingAddress.phone && <p>Téléphone: {orderDetails.shippingAddress.phone}</p>}
                 </address>
                 <p className="mt-2 text-sm flex items-center text-gray-600 dark:text-gray-400">
                   <Calendar className="h-4 w-4 mr-1" />

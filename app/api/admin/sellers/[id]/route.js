@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getServerSession } from "next-auth/next";
+import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { PrismaClient } from "@prisma/client";
 
@@ -10,13 +10,14 @@ async function checkAdminAuth() {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || !session.user || session.user.role !== 'ADMIN') {
+    // Autoriser les rôles 'ADMIN' ou 'MANAGER'
+    if (!session || !session.user || !['ADMIN', 'MANAGER'].includes(session.user.role)) {
       return false;
     }
     
     return true;
   } catch (error) {
-    console.error("Erreur lors de la vérification de l'authentification admin:", error);
+    console.error("[ADMIN_SELLER_AUTH] Erreur lors de la vérification de l'authentification :", error);
     return false;
   }
 }
@@ -24,9 +25,10 @@ async function checkAdminAuth() {
 // Récupérer les détails d'un vendeur spécifique
 export async function GET(request, { params }) {
   try {
-    const isAdmin = await checkAdminAuth();
+    const isAuthorized = await checkAdminAuth();
     
-    if (!isAdmin && process.env.NODE_ENV === 'production') {
+    if (!isAuthorized && process.env.NODE_ENV === 'production') {
+      console.log(`[ADMIN_SELLER_GET] Accès non autorisé pour l'ID ${params.id}`);
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
     
@@ -191,9 +193,10 @@ export async function GET(request, { params }) {
 // Mettre à jour le statut d'un vendeur (approuver/refuser)
 export async function PATCH(request, { params }) {
   try {
-    const isAdmin = await checkAdminAuth();
+    const isAuthorized = await checkAdminAuth();
     
-    if (!isAdmin) {
+    if (!isAuthorized) {
+      console.log(`[ADMIN_SELLER_PATCH] Accès non autorisé pour l'ID ${params.id}`);
       return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
     }
     
