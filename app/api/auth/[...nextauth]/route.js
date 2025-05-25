@@ -186,17 +186,6 @@ export const authOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 jours
     updateAge: 24 * 60 * 60, // Mise à jour toutes les 24 heures
   },
-  cookies: {
-    sessionToken: {
-      name: `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
   debug: process.env.NODE_ENV === "development",
   logger: {
     error(code, metadata) {
