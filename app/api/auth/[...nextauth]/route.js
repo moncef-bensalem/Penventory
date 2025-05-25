@@ -43,6 +43,7 @@ export const authOptions = {
       },
       async authorize(credentials) {
         if (!credentials?.email || !credentials?.password) {
+          console.log("NO CREDENTIALS");
           throw new Error("Email et mot de passe requis");
         }
 
@@ -51,7 +52,10 @@ export const authOptions = {
             where: { email: credentials.email },
           });
 
+          console.log("USER FOUND:", user);
+
           if (!user || !user.password) {
+            console.log("USER NOT FOUND OR NO PASSWORD");
             throw new Error("Email ou mot de passe incorrect");
           }
 
@@ -61,8 +65,11 @@ export const authOptions = {
           );
 
           if (!isPasswordValid) {
+            console.log("PASSWORD INVALID");
             throw new Error("Email ou mot de passe incorrect");
           }
+
+          console.log("LOGIN SUCCESS:", user.email, user.role);
 
           return {
             id: user.id,
@@ -145,6 +152,7 @@ export const authOptions = {
       if (user) {
         token.role = user.role;
         token.id = user.id;
+        console.log("JWT CALLBACK ROLE:", user.role);
       }
       return token;
     },

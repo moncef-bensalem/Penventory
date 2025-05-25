@@ -6,6 +6,9 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
+    // Ajoute ce log pour debug
+    console.log("MIDDLEWARE TOKEN:", token);
+
     // Rediriger vers la page de connexion si l'utilisateur n'est pas connecté
     // et essaie d'accéder au dashboard
     if (!token && (pathname.startsWith("/(back-office)/dashboard") || pathname.startsWith("/manager/dashboard"))) {
