@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { getServerSession } from "next-auth/next";
-import { authOptions } from "@/lib/auth";
+import { getServerSession } from "next-auth";
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
 const prisma = new PrismaClient();
 
@@ -28,15 +28,13 @@ async function checkAdminAuth(request) {
   }
 }
 
-export async function GET(request) {
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== 'ADMIN') {
+    return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
+  }
   try {
     console.log('[ADMIN_DASHBOARD_GET] Démarrage de la requête...');
-    
-    // Vérifier l'authentification
-    const auth = await checkAdminAuth(request);
-    if (!auth && process.env.NODE_ENV === 'production') {
-      return NextResponse.json({ error: "Non autorisé" }, { status: 401 });
-    }
     
     // Date courante et calcul des périodes
     const now = new Date();
