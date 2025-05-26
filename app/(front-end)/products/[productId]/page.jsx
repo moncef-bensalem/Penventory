@@ -122,7 +122,30 @@ export default function ProductDetailPage() {
           features: safeArray(data.features, []).map(feature => 
             typeof feature === 'string' ? feature : JSON.stringify(feature)
           ),
+          
+          // Nouveaux champs
+          barcode: safeString(data.barcode),
+          isWholesale: !!data.isWholesale,
+          wholesalePrice: safeNumber(data.wholesalePrice),
+          wholesaleMinQty: safeNumber(data.wholesaleMinQty),
+          isActive: data.isActive !== undefined ? !!data.isActive : true,
+          
+          // Attributs produit
           brand: safeString(data.brand),
+          color: safeString(data.color),
+          material: safeString(data.material),
+          size: safeString(data.size),
+          
+          // Options pour produits papier
+          dimensions: safeString(data.dimensions),
+          pages: safeNumber(data.pages),
+          
+          // Options pour livres
+          level: safeString(data.level),
+          collection: safeString(data.collection),
+          author: safeString(data.author),
+          language: safeString(data.language),
+          
           sku: safeString(data.sku),
           isNew: !!data.isNew,
           category: data.category ? {
@@ -192,22 +215,60 @@ export default function ProductDetailPage() {
       return;
     }
     
+    // Vérifier les options de vente en gros
+    let priceToUse = product.price;
+    let isWholesaleOrder = false;
+    
+    // Si le produit a des options de vente en gros et que la quantité est suffisante
+    if (product.isWholesale && product.wholesaleMinQty && product.wholesalePrice && quantity >= product.wholesaleMinQty) {
+      priceToUse = product.wholesalePrice;
+      isWholesaleOrder = true;
+    }
+    
+    // Calcul du prix final avec remise
+    let finalPrice = priceToUse;
+    if (product.discount && product.discount > 0) {
+      finalPrice = priceToUse * (1 - product.discount / 100);
+    }
+    
+    // Message d'ajout au panier avec information sur le prix
+    let message = `Voulez-vous ajouter ${product.name} au panier (${quantity} exemplaire${quantity > 1 ? 's' : ''}) ?`;
+    
+    // Ajouter des informations sur le prix spécial si applicable
+    if (isWholesaleOrder) {
+      message += `\n\nVous bénéficiez du prix de gros : ${finalPrice.toFixed(2)} DT par unité.`;
+    } else if (product.discount && product.discount > 0) {
+      message += `\n\nPrix après remise : ${finalPrice.toFixed(2)} DT par unité.`;
+    }
+    
     openConfirmation({
       title: "Ajouter au panier",
-      message: `Voulez-vous ajouter ${product.name} au panier (${quantity} exemplaire${quantity > 1 ? 's' : ''}) ?`,
+      message: message,
       confirmText: "Ajouter au panier",
       cancelText: "Annuler",
       type: "info",
       onConfirm: () => {
+        // Debug pour vérifier les valeurs
+        console.log('Ajout au panier - Product:', product);
+        console.log('Images disponibles:', product.images);
+        console.log('Type d\'image:', product.images && product.images.length > 0 ? typeof product.images[0] : 'aucune image');
+        
         // Extraire uniquement les propriétés nécessaires pour le panier
         const cartProduct = {
           id: product.id,
           name: product.name,
-          price: product.price,
+          price: priceToUse, // Utiliser le prix approprié (normal ou gros)
           discount: product.discount,
-          image: product.images && product.images.length > 0 ? product.images[0] : null,
+          isWholesale: isWholesaleOrder,
+          wholesalePrice: product.wholesalePrice,
+          wholesaleMinQty: product.wholesaleMinQty,
+          // S'assurer que l'image est au format de chaîne de caractères
+          image: product.images && product.images.length > 0 && typeof product.images[0] === 'string' ? 
+            product.images[0] : 
+            (product.images && product.images.length > 0 && product.images[0]?.src ? product.images[0].src : null),
           quantity: quantity,
           stock: product.stock, // Ajouter le stock pour les vérifications futures
+          barcode: product.barcode || null,
           store: product.store ? {
             id: product.store.id,
             name: product.store.name
@@ -236,6 +297,12 @@ export default function ProductDetailPage() {
           
           // Si le produit existe déjà et qu'il y a assez de stock, augmenter la quantité
           currentCart[existingProductIndex].quantity = newQuantity;
+          
+          // Mettre à jour les informations de vente en gros si nécessaire
+          if (isWholesaleOrder && newQuantity >= product.wholesaleMinQty) {
+            currentCart[existingProductIndex].isWholesale = true;
+            currentCart[existingProductIndex].price = product.wholesalePrice;
+          }
         } else {
           // Sinon, ajouter le produit
           currentCart.push(cartProduct);
@@ -243,9 +310,18 @@ export default function ProductDetailPage() {
         
         // Sauvegarder le panier mis à jour
         localStorage.setItem('cart', JSON.stringify(currentCart));
+        console.log('Panier mis à jour:', currentCart);
         
         // Déclencher un événement pour mettre à jour le compteur du panier
         window.dispatchEvent(new Event('storage'));
+        
+        // Afficher une confirmation de succès
+        openConfirmation({
+          title: "Succès",
+          message: "Produit ajouté au panier avec succès!",
+          confirmText: "OK",
+          type: "success"
+        });
       }
     });
   };
@@ -301,8 +377,10 @@ export default function ProductDetailPage() {
         name: safeString(productData.name, 'Produit'),
         price: safeNumber(productData.price),
         discount: safeNumber(productData.discount),
-        image: Array.isArray(productData.images) && productData.images.length > 0 ? 
-          productData.images[0] : null,
+        // S'assurer que l'image est au format de chaîne de caractères
+        image: Array.isArray(productData.images) && productData.images.length > 0 && typeof productData.images[0] === 'string' ?
+          productData.images[0] :
+          (Array.isArray(productData.images) && productData.images.length > 0 && productData.images[0]?.src ? productData.images[0].src : null),
         quantity: 1,
         stock: stock, // Ajouter le stock pour les vérifications futures
         store: productData.store ? {
@@ -350,6 +428,14 @@ export default function ProductDetailPage() {
           
           // Déclencher un événement pour mettre à jour le compteur du panier
           window.dispatchEvent(new Event('storage'));
+          
+          // Afficher une confirmation de succès
+          openConfirmation({
+            title: "Succès",
+            message: "Produit ajouté au panier avec succès!",
+            confirmText: "OK",
+            type: "success"
+          });
         }
       });
     } catch (error) {
@@ -608,36 +694,146 @@ export default function ProductDetailPage() {
                 
                 {/* Prix */}
                 <div className="mb-6">
-                  {product.discount > 0 ? (
-                    <div className="flex items-center">
-                      <span className="text-2xl font-bold text-gray-900 dark:text-white">
-                        {((product.price * (100 - product.discount)) / 100).toFixed(2)} DT
-                      </span>
-                      <span className="ml-2 text-sm text-gray-500 line-through">
-                        {product.price.toFixed(2)} DT
-                      </span>
-                      <span className="ml-2 text-sm font-medium text-red-600">
-                        (-{product.discount}%)
-                      </span>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex flex-col">
+                      <div className="flex items-baseline">
+                        {product.discount > 0 ? (
+                          <>
+                            <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                              {((product.price * (100 - product.discount)) / 100).toFixed(2)} DT
+                            </span>
+                            <span className="ml-2 text-sm text-gray-500 line-through">
+                              {product.price.toFixed(2)} DT
+                            </span>
+                            <span className="ml-2 text-sm font-medium text-red-600">
+                              (-{product.discount}%)
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-2xl font-bold text-gray-900 dark:text-white">
+                            {product.price.toFixed(2)} DT
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Options de vente en gros */}
+                      {product.isWholesale && product.wholesalePrice && product.wholesaleMinQty && (
+                        <div className="mt-2 flex items-center text-sm text-blue-600 dark:text-blue-400">
+                          <Truck className="h-4 w-4 mr-1" />
+                          <span>
+                            Prix de gros: <strong>{product.wholesalePrice.toFixed(2)} DT</strong> (min. {product.wholesaleMinQty} unités)
+                          </span>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {product.price.toFixed(2)} DT
-                    </div>
-                  )}
+                  </div>
                   
-                  {/* Stock */}
-                  <p className="mt-1 text-sm">
-                    {product.stock > 0 ? (
-                      <span className="text-green-600 font-medium">
-                        En stock ({product.stock} disponibles)
-                      </span>
-                    ) : (
-                      <span className="text-red-600 font-medium">
-                        Rupture de stock
-                      </span>
+                  <div className="flex flex-col space-y-2">
+                    {/* Stock */}
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      {product.stock > 0 ? (
+                        <span className="text-green-600 font-medium">
+                          En stock ({product.stock} disponibles)
+                        </span>
+                      ) : (
+                        <span className="text-red-600 font-medium">
+                          Rupture de stock
+                        </span>
+                      )}
+                    </p>
+                    
+                    {/* Code-barres */}
+                    {product.barcode && (
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Code-barres: <span className="font-mono">{product.barcode}</span>
+                      </p>
                     )}
-                  </p>
+                    
+                    {/* Status */}
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
+                      Status: 
+                      <span className={product.isActive ? "text-green-600 font-medium ml-1" : "text-red-600 font-medium ml-1"}>
+                        {product.isActive ? "Actif" : "Inactif"}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Attributs du produit */}
+                <div className="mb-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-3">Attributs du produit</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {product.brand && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Marque:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.brand}</span>
+                      </div>
+                    )}
+                    
+                    {product.color && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Couleur:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.color}</span>
+                      </div>
+                    )}
+                    
+                    {product.material && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Matériau:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.material}</span>
+                      </div>
+                    )}
+                    
+                    {product.size && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Taille:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.size}</span>
+                      </div>
+                    )}
+                    
+                    {product.dimensions && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Dimensions:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.dimensions}</span>
+                      </div>
+                    )}
+                    
+                    {product.pages > 0 && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Pages:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.pages}</span>
+                      </div>
+                    )}
+                    
+                    {product.level && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Niveau:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.level}</span>
+                      </div>
+                    )}
+                    
+                    {product.collection && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Collection:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.collection}</span>
+                      </div>
+                    )}
+                    
+                    {product.author && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Auteur:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.author}</span>
+                      </div>
+                    )}
+                    
+                    {product.language && (
+                      <div className="flex">
+                        <span className="text-sm font-medium text-gray-500 dark:text-gray-400 min-w-[100px]">Langue:</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{product.language}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 
                 {/* Choix de quantité et boutons d'action */}
@@ -893,6 +1089,7 @@ export default function ProductDetailPage() {
           </div>
         </div>
       )}
+      <ConfirmationDialog />
     </div>
   );
 }

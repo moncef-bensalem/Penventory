@@ -120,15 +120,35 @@ export async function POST(request) {
       return NextResponse.json({ error: "Format de données invalide" }, { status: 400 });
     }
     
-    const { name, description, price, stock, categoryId, images } = data;
+    // Déstructuration des données reçues
+    const { 
+      // Champs obligatoires
+      name, description, price, stock, categoryId, images,
+      // Nouveaux champs
+      barcode, tags = [], discount, isWholesale = false, wholesalePrice, wholesaleMinQty,
+      isActive = true, brand, color = "Undefined", material = "Undefined", size = "Undefined",
+      dimensions = "Undefined", pages = 0, level = "Undefined", collection, author, language = "Undefined"
+    } = data;
 
-    // Validation des données
+    // Validation des champs obligatoires
     if (!name || !description || !price || !stock || !categoryId) {
       return NextResponse.json({ 
         error: "Tous les champs obligatoires doivent être remplis",
         missingFields: Object.entries({ name, description, price, stock, categoryId })
           .filter(([_, value]) => !value)
           .map(([key]) => key)
+      }, { status: 400 });
+    }
+    
+    // Validation de la remise
+    if (discount && (discount < 0 || discount > 100)) {
+      return NextResponse.json({ error: "La remise doit être comprise entre 0 et 100%" }, { status: 400 });
+    }
+    
+    // Validation des options de vente en gros
+    if (isWholesale && (!wholesalePrice || !wholesaleMinQty)) {
+      return NextResponse.json({ 
+        error: "Le prix de gros et la quantité minimum sont requis pour la vente en gros", 
       }, { status: 400 });
     }
 
@@ -159,6 +179,7 @@ export async function POST(request) {
     try {
       const product = await prisma.product.create({
         data: {
+          // Champs de base
           name,
           description,
           price: parseFloat(price),
@@ -168,7 +189,32 @@ export async function POST(request) {
           images, // Stocker les URLs complètes
           createdAt: new Date(),
           updatedAt: new Date(),
-          rating: 0.0 // Valeur par défaut pour le rating
+          rating: 0.0, // Valeur par défaut pour le rating
+          
+          // Nouveaux champs
+          barcode: barcode || null,
+          tags: Array.isArray(tags) && tags.length > 0 ? tags : [], // Meilleure vérification pour les tags
+          discount: discount ? parseFloat(discount) : null,
+          isWholesale,
+          wholesalePrice: wholesalePrice ? parseFloat(wholesalePrice) : null,
+          wholesaleMinQty: wholesaleMinQty ? parseInt(wholesaleMinQty) : null,
+          isActive,
+          
+          // Attributs produit
+          brand: brand || null,
+          color,
+          material,
+          size,
+          
+          // Options pour produits papier
+          dimensions,
+          pages: pages ? parseInt(pages) : 0,
+          
+          // Options pour livres
+          level,
+          collection: collection || null,
+          author: author || null,
+          language
         }
       });
 

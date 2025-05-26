@@ -21,12 +21,134 @@ export default function NewProduct() {
   const [loading, setLoading] = useState(false);
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
+  const [tags, setTags] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     stock: '',
     categoryId: '',
+    brand: '',
+    color: 'Undefined',
+    material: 'Undefined',
+    size: 'Undefined',
+    dimensions: 'Undefined',
+    pages: 0,
+    level: 'Undefined',
+    collection: '',
+    author: '',
+    language: 'Undefined',
+    isWholesale: false,
+    wholesalePrice: '',
+    wholesaleMinQty: '',
+    isActive: true,
+    barcode: ''
+  });
+  
+  // Product attribute options
+  const colors = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Multi Color', name: 'Multi Color' },
+    { id: 'Red', name: 'Red' },
+    { id: 'Green', name: 'Green' },
+    { id: 'Blue', name: 'Blue' },
+    { id: 'Yellow', name: 'Yellow' },
+    { id: 'Orange', name: 'Orange' },
+    { id: 'Purple', name: 'Purple' },
+    { id: 'Pink', name: 'Pink' },
+    { id: 'Brown', name: 'Brown' },
+    { id: 'Gray', name: 'Gray' },
+    { id: 'Black', name: 'Black' },
+    { id: 'White', name: 'White' },
+    { id: 'Cyan', name: 'Cyan' },
+    { id: 'Magenta', name: 'Magenta' },
+    { id: 'Lime', name: 'Lime' },
+    { id: 'Violet', name: 'Violet' },
+    { id: 'Teal', name: 'Teal' },
+    { id: 'Turquoise', name: 'Turquoise' },
+    { id: 'Maroon', name: 'Maroon' },
+    { id: 'Beige', name: 'Beige' },
+  ];
+  
+  const sizes = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Small', name: 'Small' },
+    { id: 'Medium', name: 'Medium' },
+    { id: 'Big/Large', name: 'Big/Large' },
+  ];
+  
+  const materials = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Paper', name: 'Paper' },
+    { id: 'Plastic', name: 'Plastic' },
+    { id: 'Wood', name: 'Wood' },
+    { id: 'Rubber', name: 'Rubber' },
+    { id: 'Leather', name: 'Leather' },
+    { id: 'Fabric', name: 'Fabric' },
+    { id: 'Glass', name: 'Glass' },
+    { id: 'Ink', name: 'Ink' },
+    { id: 'Adhesive', name: 'Adhesive' },
+    { id: 'Cardboard', name: 'Cardboard' },
+    { id: 'Metal', name: 'Metal' },
+    { id: 'Foam', name: 'Foam' },
+    { id: 'Bamboo', name: 'Bamboo' },
+  ];
+  
+  const dimensions = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Normal', name: 'Normal' },
+    { id: 'TP', name: 'TP' },
+    { id: 'Recitation', name: 'Recitation' },
+    { id: 'Music', name: 'Music' },
+    { id: 'Dessin', name: 'Dessin' },
+    { id: 'Spiral', name: 'Spiral' },
+    { id: '5x5', name: '5x5' },
+    { id: '10x10', name: '10x10' },
+    { id: 'Register', name: 'Register' },
+    { id: 'Diary', name: 'Diary' }
+  ];
+  
+  const languages = [
+    { id: 'Undefined', name: 'Undefined', abbreviation: 'UNDIFINED' },
+    { id: 'Arabic', name: 'Arabic', abbreviation: 'AR' },
+    { id: 'French', name: 'French', abbreviation: 'FR' },
+    { id: 'English', name: 'English', abbreviation: 'EN' },
+    { id: 'Spanish', name: 'Spanish', abbreviation: 'ES' },
+    { id: 'Italian', name: 'Italian', abbreviation: 'IT' },
+    { id: 'German', name: 'German', abbreviation: 'DE' }
+  ];
+  
+  const classLevels = [
+    { id: 'Undefined', name: 'Undefined', level: '' },
+    { id: 'Level 1', name: 'Level 1', level: 'Primary' },
+    { id: 'Level 2', name: 'Level 2', level: 'Primary' },
+    { id: 'Level 3', name: 'Level 3', level: 'Primary' },
+    { id: 'Level 4', name: 'Level 4', level: 'Primary' },
+    { id: 'Level 5', name: 'Level 5', level: 'Primary' },
+    { id: 'Level 6', name: 'Level 6', level: 'Primary' },
+    { id: 'Level 7', name: 'Level 7', level: 'Intermediate' },
+    { id: 'Level 8', name: 'Level 8', level: 'Intermediate' },
+    { id: 'Level 9', name: 'Level 9', level: 'Intermediate' },
+    { id: 'Level 1 S.', name: 'Level 1 S.', level: 'Secondary' },
+    { id: 'Level 2 S.', name: 'Level 2 S.', level: 'Secondary' },
+    { id: 'Level 3 S.', name: 'Level 3 S.', level: 'Secondary' },
+    { id: 'BAC', name: 'BAC', level: 'Secondary' },
+    { id: 'License', name: 'License', level: 'University' },
+    { id: 'Master', name: 'Master', level: 'University' },
+    { id: 'Doctorate', name: 'Doctorate', level: 'University' }
+  ];
+  
+  // Group class levels by educational level
+  const groupedClassLevels = [];
+  const levels = [...new Set(classLevels.map((cls) => cls.level))];
+  
+  levels.forEach((level) => {
+    if (level) {
+      groupedClassLevels.push({ id: `group-${level}`, name: `--- ${level} ---`, disabled: true });
+      classLevels
+        .filter((cls) => cls.level === level)
+        .forEach((cls) => groupedClassLevels.push(cls));
+    }
   });
 
   // Charger les catégories depuis l'API
@@ -79,6 +201,7 @@ export default function NewProduct() {
         body: JSON.stringify({
           ...formData,
           images,
+          tags, // Ajouter les tags aux données envoyées
         }),
       });
 
@@ -173,6 +296,17 @@ export default function NewProduct() {
                   placeholder="Nom du produit"
                 />
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Code-barres
+                </label>
+                <Input
+                  value={formData.barcode}
+                  onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                  placeholder="Code-barres du produit"
+                />
+              </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -208,6 +342,67 @@ export default function NewProduct() {
                   placeholder="0.00"
                 />
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Remise (%)
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.discount || ''}
+                  onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              
+              {/* Wholesale option */}
+              <div className="md:col-span-2">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isWholesale"
+                    checked={formData.isWholesale}
+                    onChange={(e) => setFormData({ ...formData, isWholesale: e.target.checked })}
+                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isWholesale" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Activer la vente en gros
+                  </label>
+                </div>
+              </div>
+              
+              {formData.isWholesale && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Prix de gros (DT)
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.wholesalePrice}
+                      onChange={(e) => setFormData({ ...formData, wholesalePrice: e.target.value })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Quantité minimum pour gros
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.wholesaleMinQty}
+                      onChange={(e) => setFormData({ ...formData, wholesaleMinQty: e.target.value })}
+                      placeholder="10"
+                    />
+                  </div>
+                </>
+              )}
 
               <div>
                 <label className="block text-sm font-medium mb-2">
@@ -235,6 +430,261 @@ export default function NewProduct() {
                 placeholder="Description détaillée du produit"
                 rows={5}
               />
+            </div>
+            
+            {/* Tags */}
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Tags
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag, index) => (
+                  <div key={index} className="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full flex items-center">
+                    <span className="text-sm">{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                      className="ml-2 text-gray-500 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex">
+                <Input
+                  id="tag-input"
+                  placeholder="Ajouter un tag"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const value = e.target.value.trim();
+                      if (value && !tags.includes(value)) {
+                        setTags([...tags, value]);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  className="ml-2"
+                  onClick={() => {
+                    const input = document.getElementById('tag-input');
+                    const value = input.value.trim();
+                    if (value && !tags.includes(value)) {
+                      setTags([...tags, value]);
+                      input.value = '';
+                    }
+                  }}
+                >
+                  Ajouter
+                </Button>
+              </div>
+            </div>
+            
+            {/* Additional Product Attributes */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-6 mt-6">
+              <h3 className="text-lg font-semibold mb-4">Options supplémentaires (facultatif)</h3>
+              
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Marque / Fabricant
+                  </label>
+                  <Input
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    placeholder="Marque du produit"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Couleur
+                  </label>
+                  <Select
+                    value={formData.color}
+                    onValueChange={(value) => setFormData({ ...formData, color: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une couleur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colors.map(color => (
+                        <SelectItem key={color.id} value={color.id}>{color.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Matériau
+                  </label>
+                  <Select
+                    value={formData.material}
+                    onValueChange={(value) => setFormData({ ...formData, material: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un matériau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {materials.map(material => (
+                        <SelectItem key={material.id} value={material.id}>{material.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Taille
+                  </label>
+                  <Select
+                    value={formData.size}
+                    onValueChange={(value) => setFormData({ ...formData, size: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une taille" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sizes.map(size => (
+                        <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              
+              {/* Paper products options */}
+              <div className="mt-6">
+                <h4 className="text-md font-medium mb-3">📒 Options pour produits papier</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Modèle/Format
+                    </label>
+                    <Select
+                      value={formData.dimensions}
+                      onValueChange={(value) => setFormData({ ...formData, dimensions: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un format" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dimensions.map(dimension => (
+                          <SelectItem key={dimension.id} value={dimension.id}>{dimension.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Nombre de pages
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      value={formData.pages}
+                      onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
+                      placeholder="0"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Books & Stories options */}
+              <div className="mt-6">
+                <h4 className="text-md font-medium mb-3">📚 Options pour livres et histoires</h4>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Niveau scolaire
+                    </label>
+                    <Select
+                      value={formData.level}
+                      onValueChange={(value) => setFormData({ ...formData, level: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner un niveau" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {groupedClassLevels.map(level => (
+                          <SelectItem 
+                            key={level.id} 
+                            value={level.id}
+                            disabled={level.disabled}
+                          >
+                            {level.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Collection
+                    </label>
+                    <Input
+                      value={formData.collection}
+                      onChange={(e) => setFormData({ ...formData, collection: e.target.value })}
+                      placeholder="Collection du produit"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Auteur
+                    </label>
+                    <Input
+                      value={formData.author}
+                      onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                      placeholder="Auteur du livre"
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Langue
+                    </label>
+                    <Select
+                      value={formData.language}
+                      onValueChange={(value) => setFormData({ ...formData, language: value })}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner une langue" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {languages.map(language => (
+                          <SelectItem key={language.id} value={language.id}>{language.name}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Product status */}
+              <div className="mt-6">
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="isActive"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                    className="h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded"
+                  />
+                  <label htmlFor="isActive" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Publier le produit immédiatement
+                  </label>
+                </div>
+                <p className="text-xs text-gray-500 mt-1 ml-6">
+                  {formData.isActive ? 'Le produit sera visible dans la boutique.' : 'Le produit sera enregistré comme brouillon.'}
+                </p>
+              </div>
             </div>
           </div>
         </Card>

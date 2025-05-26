@@ -130,17 +130,42 @@ model PaymentMethod {
 }
 
 model Product {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  categoryId  String   @db.ObjectId
-  createdAt   DateTime @db.Date
-  description String
-  images      String[]
-  name        String
-  price       Float
-  rating      Float
-  stock       BigInt
-  storeId     String   @db.ObjectId
-  updatedAt   DateTime @db.Date
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  categoryId      String   @db.ObjectId
+  createdAt       DateTime @db.Date
+  description     String
+  images          String[]
+  name            String
+  price           Float
+  rating          Float    @default(0)
+  stock           BigInt
+  storeId         String   @db.ObjectId
+  updatedAt       DateTime @db.Date
+  
+  // Nouveaux champs ajoutés
+  barcode         String?           // Code-barres du produit
+  tags            String[]          // Tags pour la recherche et le filtrage
+  discount        Float?            // Pourcentage de remise
+  isWholesale     Boolean @default(false) // Support de la vente en gros
+  wholesalePrice  Float?            // Prix de vente en gros
+  wholesaleMinQty Int?              // Quantité minimum pour le prix de gros
+  isActive        Boolean @default(true) // Statut de publication
+  
+  // Attributs produit supplémentaires
+  brand           String?           // Marque ou fabricant
+  color           String? @default("Undefined") // Couleur du produit
+  material        String? @default("Undefined") // Matériau du produit
+  size            String? @default("Undefined") // Taille du produit
+  
+  // Options pour produits papier
+  dimensions      String? @default("Undefined") // Format/modèle du produit
+  pages           Int?    @default(0)  // Nombre de pages
+  
+  // Options pour livres et histoires
+  level           String? @default("Undefined") // Niveau scolaire
+  collection      String?           // Collection du livre
+  author          String?           // Auteur du livre
+  language        String? @default("Undefined") // Langue du livre
   
   category    Category @relation(fields: [categoryId], references: [id])
   produitAssociations ProduitBesoin[]

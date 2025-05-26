@@ -20,7 +20,8 @@ import {
   Edit,
   Trash2,
   Plus,
-  AlertCircle
+  AlertCircle,
+  Eye
 } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/auth-context';
@@ -130,11 +131,7 @@ export default function SellerProducts() {
 
   return (
     <div className="space-y-6">
-      <PageHead 
-        title="Mes Produits" 
-        route="/seller/dashboard/products/new" 
-        linkTitle="Ajouter un produit"
-      />
+    
 
       <Card className="p-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -225,10 +222,28 @@ export default function SellerProducts() {
                       <TableCell>{product.category?.name || 'Non catégorisé'}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
-                          <Button variant="ghost" size="icon" onClick={() => handleEdit(product.id)}>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => router.push(`/seller/dashboard/products/details/${product.id}`)}
+                            title="Voir les détails"
+                          >
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => handleEdit(product.id)}
+                            title="Modifier"
+                          >
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => openDeleteDialog(product)}>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={() => openDeleteDialog(product)}
+                            title="Supprimer"
+                          >
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>

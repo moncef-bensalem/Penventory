@@ -27,8 +27,39 @@ function serializeProduct(product) {
       const result = { ...obj };
       
       // Sérialiser les champs spécifiques
-      if (result.stock !== undefined) result.stock = result.stock.toString();
-      if (result.price !== undefined) result.price = result.price.toString();
+      if (result.stock !== undefined) {
+        // Convertir en nombre au lieu de chaîne
+        result.stock = typeof result.stock === 'string' ? 
+          parseInt(result.stock, 10) : Number(result.stock);
+      }
+      
+      if (result.price !== undefined) {
+        // Convertir en nombre au lieu de chaîne
+        result.price = typeof result.price === 'string' ? 
+          parseFloat(result.price) : Number(result.price);
+      }
+      
+      if (result.discount !== undefined) {
+        result.discount = typeof result.discount === 'string' ? 
+          parseFloat(result.discount) : Number(result.discount);
+      }
+      
+      if (result.wholesalePrice !== undefined) {
+        result.wholesalePrice = typeof result.wholesalePrice === 'string' ? 
+          parseFloat(result.wholesalePrice) : Number(result.wholesalePrice);
+      }
+      
+      if (result.wholesaleMinQty !== undefined) {
+        result.wholesaleMinQty = typeof result.wholesaleMinQty === 'string' ? 
+          parseInt(result.wholesaleMinQty, 10) : Number(result.wholesaleMinQty);
+      }
+      
+      if (result.pages !== undefined) {
+        result.pages = typeof result.pages === 'string' ? 
+          parseInt(result.pages, 10) : Number(result.pages);
+      }
+      
+      // Sérialiser les dates
       if (result.createdAt instanceof Date) result.createdAt = result.createdAt.toISOString();
       if (result.updatedAt instanceof Date) result.updatedAt = result.updatedAt.toISOString();
 

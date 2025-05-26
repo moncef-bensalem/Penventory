@@ -382,7 +382,7 @@ export default function CartPage() {
                         <div className="sm:w-24 h-24 flex-shrink-0 mb-4 sm:mb-0">
                           <div className="h-24 w-24 rounded-md overflow-hidden">
                             <img
-                              src={getImageUrl(item.images && item.images.length > 0 ? item.images[0] : null, item.name)}
+                              src={getImageUrl(item.image || (item.images && item.images.length > 0 ? item.images[0] : null), item.name)}
                               alt={item.name}
                               className="w-full h-full object-cover"
                               loading="lazy"

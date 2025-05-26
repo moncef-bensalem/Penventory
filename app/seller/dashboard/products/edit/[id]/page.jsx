@@ -33,13 +33,146 @@ export default function EditProduct({ params }) {
   const [images, setImages] = useState([]);
   const [categories, setCategories] = useState([]);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  
+  // Product attribute options
+  const colors = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Multi Color', name: 'Multi Color' },
+    { id: 'Red', name: 'Red' },
+    { id: 'Green', name: 'Green' },
+    { id: 'Blue', name: 'Blue' },
+    { id: 'Yellow', name: 'Yellow' },
+    { id: 'Orange', name: 'Orange' },
+    { id: 'Purple', name: 'Purple' },
+    { id: 'Pink', name: 'Pink' },
+    { id: 'Brown', name: 'Brown' },
+    { id: 'Gray', name: 'Gray' },
+    { id: 'Black', name: 'Black' },
+    { id: 'White', name: 'White' },
+    { id: 'Cyan', name: 'Cyan' },
+    { id: 'Magenta', name: 'Magenta' },
+    { id: 'Lime', name: 'Lime' },
+    { id: 'Violet', name: 'Violet' },
+    { id: 'Teal', name: 'Teal' },
+    { id: 'Turquoise', name: 'Turquoise' },
+    { id: 'Maroon', name: 'Maroon' },
+    { id: 'Beige', name: 'Beige' },
+  ];
+  
+  const sizes = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Small', name: 'Small' },
+    { id: 'Medium', name: 'Medium' },
+    { id: 'Big/Large', name: 'Big/Large' },
+  ];
+  
+  const materials = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Paper', name: 'Paper' },
+    { id: 'Plastic', name: 'Plastic' },
+    { id: 'Wood', name: 'Wood' },
+    { id: 'Rubber', name: 'Rubber' },
+    { id: 'Leather', name: 'Leather' },
+    { id: 'Fabric', name: 'Fabric' },
+    { id: 'Glass', name: 'Glass' },
+    { id: 'Ink', name: 'Ink' },
+    { id: 'Adhesive', name: 'Adhesive' },
+    { id: 'Cardboard', name: 'Cardboard' },
+    { id: 'Metal', name: 'Metal' },
+    { id: 'Foam', name: 'Foam' },
+    { id: 'Bamboo', name: 'Bamboo' },
+  ];
+  
+  const dimensions = [
+    { id: 'Undefined', name: 'Undefined' },
+    { id: 'Normal', name: 'Normal' },
+    { id: 'TP', name: 'TP' },
+    { id: 'Recitation', name: 'Recitation' },
+    { id: 'Music', name: 'Music' },
+    { id: 'Dessin', name: 'Dessin' },
+    { id: 'Spiral', name: 'Spiral' },
+    { id: '5x5', name: '5x5' },
+    { id: '10x10', name: '10x10' },
+    { id: 'Register', name: 'Register' },
+    { id: 'Diary', name: 'Diary' }
+  ];
+  
+  const languages = [
+    { id: 'Undefined', name: 'Undefined', abbreviation: 'UNDIFINED' },
+    { id: 'Arabic', name: 'Arabic', abbreviation: 'AR' },
+    { id: 'French', name: 'French', abbreviation: 'FR' },
+    { id: 'English', name: 'English', abbreviation: 'EN' },
+    { id: 'Spanish', name: 'Spanish', abbreviation: 'ES' },
+    { id: 'Italian', name: 'Italian', abbreviation: 'IT' },
+    { id: 'German', name: 'German', abbreviation: 'DE' }
+  ];
+  
+  const classLevels = [
+    { id: 'Undefined', name: 'Undefined', level: '' },
+    { id: 'Level 1', name: 'Level 1', level: 'Primary' },
+    { id: 'Level 2', name: 'Level 2', level: 'Primary' },
+    { id: 'Level 3', name: 'Level 3', level: 'Primary' },
+    { id: 'Level 4', name: 'Level 4', level: 'Primary' },
+    { id: 'Level 5', name: 'Level 5', level: 'Primary' },
+    { id: 'Level 6', name: 'Level 6', level: 'Primary' },
+    { id: 'Level 7', name: 'Level 7', level: 'Intermediate' },
+    { id: 'Level 8', name: 'Level 8', level: 'Intermediate' },
+    { id: 'Level 9', name: 'Level 9', level: 'Intermediate' },
+    { id: 'Level 1 S.', name: 'Level 1 S.', level: 'Secondary' },
+    { id: 'Level 2 S.', name: 'Level 2 S.', level: 'Secondary' },
+    { id: 'Level 3 S.', name: 'Level 3 S.', level: 'Secondary' },
+    { id: 'BAC', name: 'BAC', level: 'Secondary' },
+    { id: 'License', name: 'License', level: 'University' },
+    { id: 'Master', name: 'Master', level: 'University' },
+    { id: 'Doctorate', name: 'Doctorate', level: 'University' }
+  ];
+  
+  // Group class levels by educational level
+  const groupedClassLevels = [];
+  const levels = [...new Set(classLevels.map((cls) => cls.level))];
+  
+  levels.forEach((level) => {
+    if (level) {
+      groupedClassLevels.push({ id: `group-${level}`, name: `--- ${level} ---`, disabled: true });
+      classLevels
+        .filter((cls) => cls.level === level)
+        .forEach((cls) => groupedClassLevels.push(cls));
+    }
+  });
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
     stock: '',
     categoryId: '',
+    
+    // Nouveaux champs
+    barcode: '',
+    discount: '',
+    isWholesale: false,
+    wholesalePrice: '',
+    wholesaleMinQty: '',
+    isActive: true,
+    
+    // Attributs produit
+    brand: '',
+    color: '',
+    material: '',
+    size: '',
+    
+    // Options pour produits papier
+    dimensions: '',
+    pages: '',
+    
+    // Options pour livres
+    level: '',
+    collection: '',
+    author: '',
+    language: ''
   });
+  
+  // État pour gérer les tags
+  const [tags, setTags] = useState([]);
 
   // Charger les données du produit et les catégories
   useEffect(() => {
@@ -61,7 +194,29 @@ export default function EditProduct({ params }) {
           throw new Error('Erreur lors du chargement du produit');
         }
         
-        const productData = await productResponse.json();
+        const response = await productResponse.json();
+        console.log('Réponse complète de l\'API:', JSON.stringify(response, null, 2));
+        
+        // Extraire les données du produit de la réponse
+        let productData;
+        if (response.product) {
+          // L'API renvoie les données du produit dans un objet { product: ... }
+          productData = response.product;
+          console.log('Données du produit extraites de response.product:', productData);
+        } else {
+          // Si la structure est différente, utiliser directement la réponse
+          productData = response;
+          console.log('Structure différente, utilisation directe de la réponse');
+        }
+        
+        // Log pour débogage
+        console.log('Valeurs utilisées pour le formulaire:');
+        console.log('Nom:', productData.name);
+        console.log('Description:', productData.description);
+        console.log('Prix:', productData.price);
+        console.log('Stock:', productData.stock);
+        console.log('Catégorie:', productData.categoryId);
+        console.log('Tags:', productData.tags);
         
         // Mettre à jour le formulaire avec les données du produit
         setFormData({
@@ -70,7 +225,36 @@ export default function EditProduct({ params }) {
           price: productData.price?.toString() || '',
           stock: productData.stock?.toString() || '',
           categoryId: productData.categoryId || '',
+          
+          // Nouveaux champs
+          barcode: productData.barcode || '',
+          discount: productData.discount?.toString() || '',
+          isWholesale: productData.isWholesale || false,
+          wholesalePrice: productData.wholesalePrice?.toString() || '',
+          wholesaleMinQty: productData.wholesaleMinQty?.toString() || '',
+          isActive: productData.isActive !== undefined ? productData.isActive : true,
+          
+          // Attributs produit
+          brand: productData.brand || '',
+          color: productData.color || '',
+          material: productData.material || '',
+          size: productData.size || '',
+          
+          // Options pour produits papier
+          dimensions: productData.dimensions || '',
+          pages: productData.pages?.toString() || '',
+          
+          // Options pour livres
+          level: productData.level || '',
+          collection: productData.collection || '',
+          author: productData.author || '',
+          language: productData.language || ''
         });
+        
+        // Mettre à jour les tags
+        if (productData.tags && Array.isArray(productData.tags)) {
+          setTags(productData.tags);
+        }
         
         // Mettre à jour les images
         if (productData.images && productData.images.length > 0) {
@@ -117,6 +301,7 @@ export default function EditProduct({ params }) {
         body: JSON.stringify({
           ...formData,
           images,
+          tags, // Inclure les tags dans les données envoyées
         }),
       });
 
@@ -316,6 +501,322 @@ export default function EditProduct({ params }) {
                 placeholder="Description détaillée du produit"
                 rows={5}
               />
+            </div>
+            
+            {/* Code-barres et remise */}
+            <div className="grid gap-4 md:grid-cols-2 mt-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Code-barres
+                </label>
+                <Input
+                  value={formData.barcode}
+                  onChange={(e) => setFormData({ ...formData, barcode: e.target.value })}
+                  placeholder="Code-barres du produit"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Remise (%)
+                </label>
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={formData.discount}
+                  onChange={(e) => setFormData({ ...formData, discount: e.target.value })}
+                  placeholder="Remise en pourcentage"
+                />
+              </div>
+            </div>
+            
+            {/* Tags */}
+            <div className="mt-6">
+              <label className="block text-sm font-medium mb-2">
+                Tags
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map((tag, index) => (
+                  <div key={index} className="bg-gray-100 px-3 py-1 rounded-full flex items-center">
+                    <span>{tag}</span>
+                    <button
+                      type="button"
+                      onClick={() => setTags(tags.filter((_, i) => i !== index))}
+                      className="ml-2 text-gray-500 hover:text-red-500"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Ajouter un tag"
+                  id="tagInput"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const value = e.target.value.trim();
+                      if (value && !tags.includes(value)) {
+                        setTags([...tags, value]);
+                        e.target.value = '';
+                      }
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => {
+                    const input = document.getElementById('tagInput');
+                    const value = input.value.trim();
+                    if (value && !tags.includes(value)) {
+                      setTags([...tags, value]);
+                      input.value = '';
+                    }
+                  }}
+                >
+                  Ajouter
+                </Button>
+              </div>
+            </div>
+            
+            {/* Options de vente en gros */}
+            <div className="mt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <input
+                  type="checkbox"
+                  id="isWholesale"
+                  checked={formData.isWholesale}
+                  onChange={(e) => setFormData({ ...formData, isWholesale: e.target.checked })}
+                  className="h-4 w-4"
+                />
+                <label htmlFor="isWholesale" className="text-sm font-medium">
+                  Disponible en vente en gros
+                </label>
+              </div>
+              
+              {formData.isWholesale && (
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Prix de gros (DT)
+                    </label>
+                    <Input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.wholesalePrice}
+                      onChange={(e) => setFormData({ ...formData, wholesalePrice: e.target.value })}
+                      placeholder="0.00"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">
+                      Quantité minimale
+                    </label>
+                    <Input
+                      type="number"
+                      min="2"
+                      value={formData.wholesaleMinQty}
+                      onChange={(e) => setFormData({ ...formData, wholesaleMinQty: e.target.value })}
+                      placeholder="10"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+            
+            {/* Statut du produit */}
+            <div className="mt-6">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="isActive"
+                  checked={formData.isActive}
+                  onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  className="h-4 w-4"
+                />
+                <label htmlFor="isActive" className="text-sm font-medium">
+                  Produit actif (visible pour les clients)
+                </label>
+              </div>
+            </div>
+            
+            {/* Attributs produit */}
+            <div className="mt-6">
+              <h4 className="text-md font-medium mb-3">✉️ Attributs produit</h4>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Marque
+                  </label>
+                  <Input
+                    value={formData.brand}
+                    onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
+                    placeholder="Marque du produit"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Couleur
+                  </label>
+                  <Select
+                    value={formData.color}
+                    onValueChange={(value) => setFormData({ ...formData, color: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une couleur" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {colors.map(color => (
+                        <SelectItem key={color.id} value={color.id}>{color.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Matériau
+                  </label>
+                  <Select
+                    value={formData.material}
+                    onValueChange={(value) => setFormData({ ...formData, material: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un matériau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {materials.map(material => (
+                        <SelectItem key={material.id} value={material.id}>{material.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Taille
+                  </label>
+                  <Select
+                    value={formData.size}
+                    onValueChange={(value) => setFormData({ ...formData, size: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une taille" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sizes.map(size => (
+                        <SelectItem key={size.id} value={size.id}>{size.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
+            
+            {/* Options pour produits papier */}
+            <div className="mt-6">
+              <h4 className="text-md font-medium mb-3">📃 Options pour papeterie</h4>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Dimensions
+                  </label>
+                  <Select
+                    value={formData.dimensions}
+                    onValueChange={(value) => setFormData({ ...formData, dimensions: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une dimension" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {dimensions.map(dimension => (
+                        <SelectItem key={dimension.id} value={dimension.id}>{dimension.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Nombre de pages
+                  </label>
+                  <Input
+                    type="number"
+                    min="0"
+                    value={formData.pages}
+                    onChange={(e) => setFormData({ ...formData, pages: e.target.value })}
+                    placeholder="Nombre de pages"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            {/* Options pour livres et histoires */}
+            <div className="mt-6">
+              <h4 className="text-md font-medium mb-3">📚 Options pour livres et histoires</h4>
+              <div className="grid gap-4 md:grid-cols-2">
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Niveau scolaire
+                  </label>
+                  <Select
+                    value={formData.level}
+                    onValueChange={(value) => setFormData({ ...formData, level: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner un niveau" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classLevels.map(level => (
+                        <SelectItem 
+                          key={level.id} 
+                          value={level.id}
+                        >
+                          {level.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Collection
+                  </label>
+                  <Input
+                    value={formData.collection}
+                    onChange={(e) => setFormData({ ...formData, collection: e.target.value })}
+                    placeholder="Collection du livre"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Auteur
+                  </label>
+                  <Input
+                    value={formData.author}
+                    onChange={(e) => setFormData({ ...formData, author: e.target.value })}
+                    placeholder="Auteur du livre"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">
+                    Langue
+                  </label>
+                  <Select
+                    value={formData.language}
+                    onValueChange={(value) => setFormData({ ...formData, language: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner une langue" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {languages.map(language => (
+                        <SelectItem key={language.id} value={language.id}>{language.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
             </div>
           </div>
         </Card>
