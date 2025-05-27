@@ -22,7 +22,8 @@ export async function POST(req) {
       items, 
       shippingAddress, 
       total,
-      customerInfo
+      customerInfo,
+      paymentMethod // Méthode de paiement choisie par le client
     } = data;
     
     console.log('Order request data:', {
@@ -99,6 +100,11 @@ export async function POST(req) {
       // Créer un numéro de commande unique
       const orderNumber = `ORD-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
       
+      // Déterminer le statut de paiement en fonction de la méthode choisie
+      // Si paiement par carte, le statut est PAID, sinon PENDING
+      const paymentStatus = paymentMethod === 'card' ? 'PAID' : 'PENDING';
+      console.log(`Payment method: ${paymentMethod}, setting payment status to: ${paymentStatus}`);
+      
       console.log(`Creating order for store ${storeId}, number: ${orderNumber}, items: ${storeItems.length}`);
       
       // Vérifier si un utilisateur avec cet email existe déjà
@@ -139,12 +145,13 @@ export async function POST(req) {
         // Préparer les données complètes de la commande
         const orderData = {
           number: orderNumber,
-          status: "PENDING",
+          status: 'EN_ATTENTE',
           total: storeTotal,
           shippingAddress: typeof shippingAddress === 'string' 
             ? shippingAddress 
             : JSON.stringify(shippingAddress),
           storeId: storeId,
+          paymentStatus, // Statut de paiement déterminé en fonction de la méthode de paiement
           items: {
             create: storeItems.map(item => ({
               quantity: BigInt(item.quantity),

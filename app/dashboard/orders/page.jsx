@@ -92,7 +92,7 @@ export default function OrdersPage() {
           style: 'currency', 
           currency: 'TND' 
         }).format(order.total || 0),
-        paymentStatus: 'PAID', // Par défaut, peut être modifié si disponible
+        paymentStatus: order.paymentStatus || 'PENDING', // Utiliser le statut de paiement réel
         items: order.items || [],
         createdAt: order.createdAt,
         formattedCreatedAt: order.createdAt ? 

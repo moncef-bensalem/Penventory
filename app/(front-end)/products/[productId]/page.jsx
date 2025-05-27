@@ -250,8 +250,6 @@ export default function ProductDetailPage() {
       onConfirm: () => {
         // Debug pour vérifier les valeurs
         console.log('Ajout au panier - Product:', product);
-        console.log('Images disponibles:', product.images);
-        console.log('Type d\'image:', product.images && product.images.length > 0 ? typeof product.images[0] : 'aucune image');
         
         // Extraire uniquement les propriétés nécessaires pour le panier
         const cartProduct = {
@@ -262,10 +260,7 @@ export default function ProductDetailPage() {
           isWholesale: isWholesaleOrder,
           wholesalePrice: product.wholesalePrice,
           wholesaleMinQty: product.wholesaleMinQty,
-          // S'assurer que l'image est au format de chaîne de caractères
-          image: product.images && product.images.length > 0 && typeof product.images[0] === 'string' ? 
-            product.images[0] : 
-            (product.images && product.images.length > 0 && product.images[0]?.src ? product.images[0].src : null),
+          image: product.images && product.images.length > 0 ? product.images[0] : null,
           quantity: quantity,
           stock: product.stock, // Ajouter le stock pour les vérifications futures
           barcode: product.barcode || null,
@@ -377,10 +372,8 @@ export default function ProductDetailPage() {
         name: safeString(productData.name, 'Produit'),
         price: safeNumber(productData.price),
         discount: safeNumber(productData.discount),
-        // S'assurer que l'image est au format de chaîne de caractères
-        image: Array.isArray(productData.images) && productData.images.length > 0 && typeof productData.images[0] === 'string' ?
-          productData.images[0] :
-          (Array.isArray(productData.images) && productData.images.length > 0 && productData.images[0]?.src ? productData.images[0].src : null),
+        image: Array.isArray(productData.images) && productData.images.length > 0 ? 
+          productData.images[0] : null,
         quantity: 1,
         stock: stock, // Ajouter le stock pour les vérifications futures
         store: productData.store ? {

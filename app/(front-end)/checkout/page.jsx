@@ -176,6 +176,7 @@ export default function CheckoutPage() {
         couponApplied: couponApplied,
         couponDiscount: couponDiscount,
         couponAmount: couponAmount,
+        paymentMethod: formData.paymentMethod, // Transmettre la méthode de paiement à l'API
         customerInfo: {
           name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,

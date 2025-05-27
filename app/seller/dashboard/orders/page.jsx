@@ -40,6 +40,20 @@ const statusColors = {
   'ANNULEE': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
 };
 
+const paymentStatusColors = {
+  'PENDING': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
+  'PAID': 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
+  'FAILED': 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
+  'REFUNDED': 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200'
+};
+
+const paymentStatusLabels = {
+  'PENDING': 'En attente',
+  'PAID': 'Payé',
+  'FAILED': 'Échoué',
+  'REFUNDED': 'Remboursé'
+};
+
 export default function SellerOrders() {
   const [loading, setLoading] = useState(true);
   const [orders, setOrders] = useState([]);
@@ -127,6 +141,48 @@ export default function SellerOrders() {
       setLoading(false);
     }
   };
+  
+  const handleUpdatePaymentStatus = async (orderId, newPaymentStatus) => {
+    if (!orderId) {
+      toast.error("ID de commande invalide");
+      return;
+    }
+    
+    try {
+      setLoading(true);
+      console.log(`Mise à jour du statut de paiement de la commande ${orderId} à ${newPaymentStatus}`);
+      
+      const response = await fetch(`/api/seller/orders`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          orderId, 
+          paymentStatus: newPaymentStatus 
+        }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) {
+        console.error('Erreur de mise à jour du paiement:', data);
+        throw new Error(data.error || 'Erreur lors de la mise à jour du statut de paiement');
+      }
+
+      toast.success('Statut de paiement mis à jour avec succès');
+      
+      // Mettre à jour l'état local pour éviter de recharger toutes les commandes
+      setOrders(orders.map(order => 
+        order.id === orderId ? { ...order, paymentStatus: newPaymentStatus } : order
+      ));
+    } catch (error) {
+      console.error('Erreur détaillée:', error);
+      toast.error(error.message || 'Erreur lors de la mise à jour du statut de paiement');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -188,6 +244,7 @@ export default function SellerOrders() {
                 <TableHead>Client</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead>Statut</TableHead>
+                <TableHead>Paiement</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -202,7 +259,7 @@ export default function SellerOrders() {
                 </TableRow>
               ) : orders.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-10">
+                  <TableCell colSpan={7} className="text-center py-10">
                     <div className="flex flex-col items-center justify-center text-muted-foreground">
                       <ShoppingBag className="h-10 w-10 mb-2" />
                       <p>Aucune commande trouvée</p>
@@ -232,6 +289,26 @@ export default function SellerOrders() {
                       <Badge className={statusColors[order.status]}>
                         {order.status}
                       </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        value={order.paymentStatus || 'PENDING'}
+                        onValueChange={(value) => handleUpdatePaymentStatus(order.id, value)}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue>
+                            <Badge className={paymentStatusColors[order.paymentStatus] || paymentStatusColors['PENDING']}>
+                              {paymentStatusLabels[order.paymentStatus] || paymentStatusLabels['PENDING']}
+                            </Badge>
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="PENDING">En attente</SelectItem>
+                          <SelectItem value="PAID">Payé</SelectItem>
+                          <SelectItem value="FAILED">Échoué</SelectItem>
+                          <SelectItem value="REFUNDED">Remboursé</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <Select

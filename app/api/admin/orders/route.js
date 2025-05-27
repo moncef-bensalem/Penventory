@@ -65,6 +65,7 @@ export async function GET() {
       id: order.id,
       number: order.number,
       status: order.status,
+      paymentStatus: order.paymentStatus, // Ajouter le statut de paiement
       total: order.total,
       shippingAddress: order.shippingAddress,
       createdAt: order.createdAt,

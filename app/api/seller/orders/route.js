@@ -203,7 +203,7 @@ export async function PATCH(request) {
 
     const { store } = sellerData;
     const body = await request.json();
-    const { orderId, status } = body;
+    const { orderId, status, paymentStatus } = body;
     
     if (!orderId) {
       console.log('[SELLER_ORDERS_PATCH] Order ID missing in request body');
@@ -238,18 +238,52 @@ export async function PATCH(request) {
       'ANNULEE'
     ];
 
-    if (!status || !validStatuses.includes(status)) {
+    // Vérifier que le statut de paiement est valide
+    const validPaymentStatuses = [
+      'PENDING',
+      'PAID',
+      'FAILED',
+      'REFUNDED'
+    ];
+
+    // Vérifier le statut de commande si fourni
+    if (status && !validStatuses.includes(status)) {
       console.log(`[SELLER_ORDERS_PATCH] Invalid status: ${status}`);
       return NextResponse.json(
-        { error: "Statut invalide" },
+        { error: "Statut de commande invalide" },
+        { status: 400 }
+      );
+    }
+    
+    // Vérifier le statut de paiement si fourni
+    if (paymentStatus && !validPaymentStatuses.includes(paymentStatus)) {
+      console.log(`[SELLER_ORDERS_PATCH] Invalid payment status: ${paymentStatus}`);
+      return NextResponse.json(
+        { error: "Statut de paiement invalide" },
+        { status: 400 }
+      );
+    }
+    
+    // Au moins un des deux statuts doit être fourni
+    if (!status && !paymentStatus) {
+      console.log(`[SELLER_ORDERS_PATCH] No status provided`);
+      return NextResponse.json(
+        { error: "Veuillez fournir un statut de commande ou de paiement" },
         { status: 400 }
       );
     }
 
-    // Mettre à jour le statut
+    // Préparer les données à mettre à jour
+    const updateData = {};
+    if (status) updateData.status = status;
+    if (paymentStatus) updateData.paymentStatus = paymentStatus;
+    
+    console.log(`[SELLER_ORDERS_PATCH] Updating order ${orderId} with:`, updateData);
+    
+    // Mettre à jour la commande
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { status },
+      data: updateData,
       include: {
         customer: {
           select: {
