@@ -121,7 +121,7 @@ export default function BecomeSellerPage() {
   const faqs = getFaqs(t);
   
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <section className="relative bg-orange-500 py-20 overflow-hidden">
         <div className="container mx-auto px-4 relative z-10 flex flex-col md:flex-row items-center">
@@ -133,7 +133,7 @@ export default function BecomeSellerPage() {
             </p>
             <Link 
               href="register/seller" 
-              className="bg-white text-orange-600 px-6 py-3 rounded-lg font-bold inline-flex items-center hover:bg-gray-100 transition-colors"
+              className="bg-white text-orange-600 px-6 py-3 rounded-lg font-bold inline-flex items-center hover:bg-gray-100 transition-colors dark:bg-gray-900 dark:text-orange-400 dark:hover:bg-gray-800"
             >
               {t('becomeSellerButton')}
               <ArrowRight className="ml-2 h-5 w-5" />
@@ -154,16 +154,16 @@ export default function BecomeSellerPage() {
       </section>
 
       {/* Steps Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('sellerStepsTitle')}</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">{t('sellerStepsTitle')}</h2>
           <div className="max-w-3xl mx-auto">
             {sellerSteps.map((step, index) => (
               <div key={step.id} className="flex items-start mb-8">
                 <div className="mr-4 mt-1">{step.icon}</div>
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-gray-600">{step.description}</p>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900 dark:text-white">{step.title}</h3>
+                  <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
                 </div>
               </div>
             ))}
@@ -172,17 +172,17 @@ export default function BecomeSellerPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('sellerBenefitsTitle')}</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">{t('sellerBenefitsTitle')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {sellerBenefits.map((benefit) => (
-              <div key={benefit.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
+              <div key={benefit.id} className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow dark:bg-gray-800">
                 <div className="flex justify-center mb-4">
                   {benefit.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-center mb-3">{benefit.title}</h3>
-                <p className="text-gray-600 text-center">{benefit.description}</p>
+                <h3 className="text-xl font-semibold text-center mb-3 text-gray-900 dark:text-white">{benefit.title}</h3>
+                <p className="text-gray-600 text-center dark:text-gray-300">{benefit.description}</p>
               </div>
             ))}
           </div>
@@ -198,7 +198,7 @@ export default function BecomeSellerPage() {
           </p>
           <Link 
             href="/register/seller" 
-            className="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold text-lg inline-flex items-center hover:bg-gray-100 transition-colors"
+            className="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold text-lg inline-flex items-center hover:bg-gray-100 transition-colors dark:bg-gray-900 dark:text-orange-400 dark:hover:bg-gray-800"
           >
             {t('signUpAsSeller')}
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -207,17 +207,17 @@ export default function BecomeSellerPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-16 bg-gray-50 dark:bg-gray-900">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">{t('faqTitle')}</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">{t('faqTitle')}</h2>
           <div className="max-w-3xl mx-auto">
             {faqs.map((faq, index) => (
-              <div key={index} className="mb-6 border-b border-gray-200 pb-6">
+              <div key={index} className="mb-6 border-b border-gray-200 pb-6 dark:border-gray-700">
                 <button
                   className="flex justify-between items-center w-full text-left"
                   onClick={() => toggleFaq(index)}
                 >
-                  <h3 className="text-xl font-medium">{faq.question}</h3>
+                  <h3 className="text-xl font-medium text-gray-900 dark:text-white">{faq.question}</h3>
                   <span className="text-orange-500">
                     {expandedFaq === index ? (
                       <span className="text-2xl">−</span>
@@ -227,7 +227,7 @@ export default function BecomeSellerPage() {
                   </span>
                 </button>
                 {expandedFaq === index && (
-                  <div className="mt-4 text-gray-600">
+                  <div className="mt-4 text-gray-600 dark:text-gray-300">
                     <p>{faq.answer}</p>
                   </div>
                 )}
@@ -238,7 +238,7 @@ export default function BecomeSellerPage() {
       </section>
 
       {/* Besoin d'aide */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-white dark:bg-gray-800">
         <div className="container mx-auto px-4 text-center">
           <div className="inline-flex items-center text-orange-500 mb-4">
             <svg className="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -246,13 +246,13 @@ export default function BecomeSellerPage() {
             </svg>
             <h3 className="text-xl font-semibold">{t('helpSectionTitle')}</h3>
           </div>
-          <p className="text-gray-600 mb-6">
+          <p className="text-gray-600 mb-6 dark:text-gray-300">
             {t('helpSectionDescription')}
           </p>
           <div className="flex justify-center">
             <Link 
               href="/help" 
-              className="text-orange-500 border border-orange-500 px-6 py-3 rounded-lg font-medium hover:bg-orange-50 transition-colors mr-4"
+              className="text-orange-500 border border-orange-500 px-6 py-3 rounded-lg font-medium hover:bg-orange-50 transition-colors mr-4 dark:text-orange-400 dark:border-orange-400 dark:hover:bg-gray-900"
             >
               {t('helpCenter')}
             </Link>

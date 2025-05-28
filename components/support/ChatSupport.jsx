@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useLanguage } from '@/context/language-context';
+import { useTheme } from '@/context/theme-context';
 
 // Fonction pour obtenir les catégories de support traduites
 const getSupportCategories = (t) => [
@@ -80,6 +81,7 @@ const getPredefinedResponses = (t) => ({
 
 export default function ChatSupport() {
   const { t, language } = useLanguage();
+  const { theme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const [chatStep, setChatStep] = useState('welcome'); // welcome, contact, category, questions, chat
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -238,9 +240,9 @@ export default function ChatSupport() {
       
       {/* Fenêtre de chat */}
       {isOpen && (
-        <div className="fixed bottom-20 right-6 w-80 md:w-96 bg-white rounded-lg shadow-xl z-50 flex flex-col overflow-hidden max-h-[80vh]">
+        <div className="fixed bottom-20 right-6 w-80 md:w-96 bg-white dark:bg-gray-800 rounded-lg shadow-xl z-50 flex flex-col overflow-hidden max-h-[80vh]">
           {/* En-tête */}
-          <div className="bg-orange-500 text-white p-3 flex justify-between items-center">
+          <div className="bg-orange-500 dark:bg-orange-600 text-white p-3 flex justify-between items-center">
             <div className="flex items-center">
               <MessageSquare size={20} className="mr-2" />
               <span className="font-semibold">{t('chatSupportTitle')}</span>
@@ -251,20 +253,20 @@ export default function ChatSupport() {
           </div>
           
           {/* Corps du chat */}
-          <div className="flex-1 overflow-y-auto p-3 max-h-[400px] min-h-[300px] bg-gray-50">
+          <div className="flex-1 overflow-y-auto p-3 max-h-[400px] min-h-[300px] bg-gray-50 dark:bg-gray-900">
             {chatStep === 'welcome' && (
               <div className="text-center py-4">
-                <div className="bg-orange-500 text-white rounded-full p-3 inline-flex mb-3">
+                <div className="bg-orange-500 dark:bg-orange-600 text-white rounded-full p-3 inline-flex mb-3">
                   <MessageSquare size={24} />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">{t('chatWelcomeTitle')}</h3>
-                <p className="text-sm text-gray-600 mb-4">{t('chatWelcomeDescription')}</p>
+                <h3 className="text-lg font-semibold mb-2 dark:text-white">{t('chatWelcomeTitle')}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{t('chatWelcomeDescription')}</p>
                 
-                <div className="bg-white p-4 rounded-lg shadow-sm">
-                  <h4 className="text-sm font-medium mb-3">{t('contactInfoTitle')}</h4>
+                <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+                  <h4 className="text-sm font-medium mb-3 dark:text-white">{t('contactInfoTitle')}</h4>
                   <form onSubmit={handleContactSubmit}>
                     <div className="mb-3">
-                      <label htmlFor="firstName" className="block text-xs text-gray-600 mb-1">
+                      <label htmlFor="firstName" className="block text-xs text-gray-600 mb-1 dark:text-white">
                         {t('firstName')} <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -272,13 +274,14 @@ export default function ChatSupport() {
                         id="firstName"
                         name="firstName"
                         value={contactInfo.firstName}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded-md text-sm"
+                        onChange={(e) => setContactInfo({...contactInfo, firstName: e.target.value})}
+                        placeholder={t('firstNamePlaceholder')}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
                         required
                       />
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="lastName" className="block text-xs text-gray-600 mb-1">
+                      <label htmlFor="lastName" className="block text-xs text-gray-600 mb-1 dark:text-white">
                         {t('lastName')} <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -286,13 +289,14 @@ export default function ChatSupport() {
                         id="lastName"
                         name="lastName"
                         value={contactInfo.lastName}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded-md text-sm"
+                        onChange={(e) => setContactInfo({...contactInfo, lastName: e.target.value})}
+                        placeholder={t('lastNamePlaceholder')}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
                         required
                       />
                     </div>
                     <div className="mb-3">
-                      <label htmlFor="email" className="block text-xs text-gray-600 mb-1">
+                      <label htmlFor="email" className="block text-xs text-gray-600 mb-1 dark:text-white">
                         {t('email')} <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -300,14 +304,15 @@ export default function ChatSupport() {
                         id="email"
                         name="email"
                         value={contactInfo.email}
-                        onChange={handleInputChange}
-                        className="w-full p-2 border rounded-md text-sm"
+                        onChange={(e) => setContactInfo({...contactInfo, email: e.target.value})}
+                        placeholder={t('emailPlaceholder')}
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-700 dark:text-white"
                         required
                       />
                     </div>
                     <Button 
                       type="submit" 
-                      className="w-full bg-orange-500 hover:bg-orange-600 text-white"
+                      className="w-full bg-orange-500 hover:bg-orange-600 text-white dark:bg-orange-600 dark:hover:bg-orange-700"
                     >
                       {t('validate')}
                     </Button>
@@ -326,15 +331,15 @@ export default function ChatSupport() {
                           <div className="bg-orange-500 text-white rounded-full p-1 mr-2">
                             <UserCheck size={16} />
                           </div>
-                          <div className="bg-gray-100 rounded-lg p-2 max-w-[80%]">
-                            <p className="text-sm">{msg.text}</p>
+                          <div className="bg-gray-100 rounded-lg p-2 max-w-[80%] dark:bg-gray-700 dark:text-white">
+                            <p className="text-sm text-gray-900 dark:text-white">{msg.text}</p>
                           </div>
                         </div>
                       )}
                       {msg.sender === 'user' && (
                         <div className="flex items-start justify-end">
                           <div className="bg-blue-500 text-white rounded-lg p-2 max-w-[80%]">
-                            <p className="text-sm">{msg.text}</p>
+                            <p className="text-sm text-gray-900 dark:text-white">{msg.text}</p>
                           </div>
                           <div className="bg-blue-600 text-white rounded-full p-1 ml-2">
                             <User size={16} />
@@ -347,7 +352,7 @@ export default function ChatSupport() {
                             <button
                               key={i}
                               onClick={() => handleQuickReply(reply)}
-                              className="bg-white border border-gray-300 rounded-lg px-3 py-1 text-sm mr-2 mb-2 hover:bg-gray-100"
+                              className="bg-white border border-gray-300 rounded-lg px-3 py-1 text-sm mr-2 mb-2 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
                             >
                               {reply}
                             </button>
@@ -358,17 +363,17 @@ export default function ChatSupport() {
                   ))}
                 </div>
                 
-                <div className="bg-white p-3 rounded-lg shadow-sm">
-                  <h4 className="text-sm font-medium mb-3">{t('chooseOption')}</h4>
-                  <div className="space-y-2">
+                <div className="bg-white p-3 rounded-lg shadow-sm dark:bg-gray-800">
+                  <h3 className="text-lg font-semibold mb-4 dark:text-white">{t('chatSelectCategory')}</h3>
+                  <div className="grid grid-cols-2 gap-3">
                     {supportCategories.map((category) => (
                       <button
                         key={category.id}
                         onClick={() => selectCategory(category)}
-                        className="w-full text-left p-2 border rounded-md hover:bg-gray-50 flex items-center"
+                        className="flex flex-col items-center justify-center p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
                       >
-                        <span className="mr-2">{category.icon}</span>
-                        <span className="text-sm">{category.label}</span>
+                        <span className="text-2xl mb-2">{category.icon}</span>
+                        <span className="text-sm font-medium dark:text-white">{category.label}</span>
                       </button>
                     ))}
                   </div>
@@ -386,15 +391,15 @@ export default function ChatSupport() {
                           <div className="bg-orange-500 text-white rounded-full p-1 mr-2">
                             <UserCheck size={16} />
                           </div>
-                          <div className="bg-gray-100 rounded-lg p-2 max-w-[80%]">
-                            <p className="text-sm">{msg.text}</p>
+                          <div className="bg-gray-100 rounded-lg p-2 max-w-[80%] dark:bg-gray-700 dark:text-white">
+                            <p className="text-sm text-gray-900 dark:text-white">{msg.text}</p>
                           </div>
                         </div>
                       )}
                       {msg.sender === 'user' && (
                         <div className="flex items-start justify-end">
                           <div className="bg-blue-500 text-white rounded-lg p-2 max-w-[80%]">
-                            <p className="text-sm">{msg.text}</p>
+                            <p className="text-sm text-gray-900 dark:text-white">{msg.text}</p>
                           </div>
                           <div className="bg-blue-600 text-white rounded-full p-1 ml-2">
                             <User size={16} />
@@ -405,16 +410,16 @@ export default function ChatSupport() {
                   ))}
                 </div>
                 
-                <div className="bg-white p-3 rounded-lg shadow-sm">
+                <div className="bg-white p-3 rounded-lg shadow-sm dark:bg-gray-800">
                   <div className="flex items-center mb-3">
                     <button 
                       onClick={() => setChatStep('category')}
-                      className="mr-2 text-blue-500 hover:underline flex items-center text-xs"
+                      className="mr-2 text-blue-500 hover:underline flex items-center text-xs dark:text-white"
                     >
                       <ChevronUp size={16} />
                       <span>{t('back')}</span>
                     </button>
-                    <h4 className="text-sm font-medium">
+                    <h4 className="text-sm font-medium dark:text-white">
                       {selectedCategory.icon} {selectedCategory.label}
                     </h4>
                   </div>
@@ -424,10 +429,10 @@ export default function ChatSupport() {
                       <button
                         key={question.id}
                         onClick={() => selectQuestion(question)}
-                        className="w-full text-left p-2 border rounded-md hover:bg-gray-50 flex items-center"
+                        className="w-full text-left p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-orange-50 dark:hover:bg-orange-900/20 hover:border-orange-300 dark:hover:border-orange-700 transition-colors"
                       >
                         <HelpCircle size={16} className="mr-2 text-gray-400" />
-                        <span className="text-sm">{question.question}</span>
+                        <span className="text-sm text-gray-900 dark:text-white">{question.question}</span>
                       </button>
                     ))}
                   </div>
@@ -445,15 +450,15 @@ export default function ChatSupport() {
                           <div className="bg-orange-500 text-white rounded-full p-1 mr-2">
                             <UserCheck size={16} />
                           </div>
-                          <div className="bg-gray-100 rounded-lg p-2 max-w-[80%]">
-                            <p className="text-sm">{msg.text}</p>
+                          <div className="bg-gray-100 rounded-lg p-2 max-w-[80%] dark:bg-gray-700 dark:text-white">
+                            <p className="text-sm text-gray-900 dark:text-white">{msg.text}</p>
                           </div>
                         </div>
                       )}
                       {msg.sender === 'user' && (
                         <div className="flex items-start justify-end">
                           <div className="bg-blue-500 text-white rounded-lg p-2 max-w-[80%]">
-                            <p className="text-sm">{msg.text}</p>
+                            <p className="text-sm text-gray-900 dark:text-white">{msg.text}</p>
                           </div>
                           <div className="bg-blue-600 text-white rounded-full p-1 ml-2">
                             <User size={16} />
@@ -499,24 +504,24 @@ export default function ChatSupport() {
           
           {/* Pied de page avec zone de saisie */}
           {chatStep === 'chat' && (
-            <div className="border-t p-3 bg-white">
+            <div className="border-t dark:border-gray-700 p-3 bg-white dark:bg-gray-800">
               <div className="flex items-center">
                 <input
                   type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder={t('typingPlaceholder')}
-                  className="flex-1 p-2 border rounded-l-md focus:outline-none"
+                  className="flex-1 p-2 border dark:border-gray-600 rounded-l-md focus:outline-none dark:bg-gray-700 dark:text-white"
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                 />
                 <Button
                   onClick={handleSendMessage}
-                  className="rounded-l-none bg-orange-500 hover:bg-orange-600"
+                  className="rounded-l-none bg-orange-500 hover:bg-orange-600 dark:bg-orange-600 dark:hover:bg-orange-700"
                 >
                   <Send size={18} />
                 </Button>
               </div>
-              <div className="text-xs text-gray-400 mt-1 text-center">
+              <div className="text-xs text-gray-400 dark:text-gray-500 mt-1 text-center">
                 {t('cannotTypeNow')}
               </div>
             </div>

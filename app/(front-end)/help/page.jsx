@@ -138,7 +138,7 @@ export default function HelpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-orange-500 to-orange-400 text-white py-16">
         <div className="container mx-auto px-4 text-center">
@@ -151,7 +151,7 @@ export default function HelpPage() {
                 placeholder={t('searchPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-4 pl-12 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full p-4 pl-12 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white dark:border-gray-700"
               />
               <Search className="absolute left-4 top-4 text-gray-400" />
               <button
@@ -171,30 +171,30 @@ export default function HelpPage() {
           {helpCategories.map((category) => (
             <div
               key={category.id}
-              className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col items-center text-center"
+              className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col items-center text-center dark:bg-gray-800"
               onClick={() => toggleCategory(category.id)}
             >
               {category.icon}
-              <h3 className="text-lg font-semibold mt-4 mb-2">{category.title}</h3>
-              <p className="text-sm text-gray-600">{category.description}</p>
+              <h3 className="text-lg font-semibold mt-4 mb-2 text-gray-900 dark:text-white">{category.title}</h3>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{category.description}</p>
             </div>
           ))}
         </div>
 
         {/* FAQ Section */}
         {expandedCategory && (
-          <div className="bg-white rounded-lg shadow-sm p-6 mb-12">
-            <h2 className="text-2xl font-bold mb-6">
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-12 dark:bg-gray-800">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
               {helpCategories.find(cat => cat.id === expandedCategory)?.title}
             </h2>
             <div className="space-y-4">
               {faqByCategory[expandedCategory].map((faq, index) => (
-                <div key={index} className="border-b pb-4">
+                <div key={index} className="border-b pb-4 border-gray-200 dark:border-gray-700">
                   <button
                     className="w-full text-left flex justify-between items-center py-2"
                     onClick={() => toggleQuestion(index)}
                   >
-                    <span className="font-medium text-lg">{faq.question}</span>
+                    <span className="font-medium text-lg text-gray-900 dark:text-white">{faq.question}</span>
                     {expandedQuestions[index] ? (
                       <ChevronUp className="h-5 w-5 text-orange-500" />
                     ) : (
@@ -202,7 +202,7 @@ export default function HelpPage() {
                     )}
                   </button>
                   {expandedQuestions[index] && (
-                    <div className="mt-2 text-gray-600 whitespace-pre-line">
+                    <div className="mt-2 text-gray-600 whitespace-pre-line dark:text-gray-300">
                       {faq.answer}
                     </div>
                   )}
@@ -213,10 +213,10 @@ export default function HelpPage() {
         )}
 
         {/* Besoin de plus d'aide */}
-        <div className="bg-white rounded-lg shadow-sm p-6 text-center">
+        <div className="bg-white rounded-lg shadow-sm p-6 text-center dark:bg-gray-800">
           <HelpCircle className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">{t('needMoreHelp')}</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{t('needMoreHelp')}</h2>
+          <p className="text-gray-600 mb-6 dark:text-gray-300">
             {t('needMoreHelpDescription')}
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
@@ -232,7 +232,7 @@ export default function HelpPage() {
                 const chatButton = document.querySelector('[data-chat-button]');
                 if (chatButton) chatButton.click();
               }}
-              className="bg-white text-orange-500 border border-orange-500 px-6 py-3 rounded-lg hover:bg-orange-50 transition-colors"
+              className="bg-white text-orange-500 border border-orange-500 px-6 py-3 rounded-lg hover:bg-orange-50 transition-colors dark:bg-gray-900 dark:text-orange-400 dark:border-orange-400 dark:hover:bg-gray-800"
             >
               {t('liveChat')}
             </button>

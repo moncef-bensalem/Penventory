@@ -115,16 +115,37 @@ export async function GET(request) {
     });
 
     // Calculer les statistiques
-    // Inclure toutes les commandes, pas seulement celles complétées, pour le chiffre d'affaires total
-    console.log('Nombre de commandes pour la période actuelle:', currentPeriodOrders.length);
+    // Exclure les commandes annulées et remboursées du calcul du chiffre d'affaires
+    const validOrders = currentPeriodOrders.filter(order => 
+      !['CANCELLED', 'ANNULEE'].includes(order.status) && 
+      !['REFUNDED', 'CANCELLED'].includes(order.paymentStatus)
+    );
     
-    const totalRevenue = currentPeriodOrders.reduce((sum, order) => {
-      console.log(`Commande ID: ${order.id}, Total: ${order.total}`);
+    console.log('Nombre de commandes pour la période actuelle:', currentPeriodOrders.length);
+    console.log('Nombre de commandes valides (hors annulées/remboursées):', validOrders.length);
+    
+    // Afficher les commandes annulées ou remboursées qui sont exclues
+    const excludedOrders = currentPeriodOrders.filter(order => 
+      ['CANCELLED', 'ANNULEE'].includes(order.status) || 
+      ['REFUNDED', 'CANCELLED'].includes(order.paymentStatus)
+    );
+    
+    if (excludedOrders.length > 0) {
+      console.log('Commandes exclues du calcul du chiffre d\'affaires:');
+      excludedOrders.forEach(order => {
+        console.log(`Commande ID: ${order.id}, Total: ${order.total}, Status: ${order.status}, PaymentStatus: ${order.paymentStatus}`);
+      });
+    }
+    
+    // Calculer le chiffre d'affaires uniquement sur les commandes valides
+    const totalRevenue = validOrders.reduce((sum, order) => {
+      console.log(`Commande valide ID: ${order.id}, Total: ${order.total}`);
       return sum + order.total;
     }, 0);
     
-    console.log('Chiffre d\'affaires total:', totalRevenue);
+    console.log('Chiffre d\'affaires total (hors annulées/remboursées):', totalRevenue);
     
+    // Nombre total de commandes (incluant toutes les commandes pour les statistiques)
     const totalOrders = currentPeriodOrders.length;
     
     // Utiliser Number() pour convertir les BigInt en nombre

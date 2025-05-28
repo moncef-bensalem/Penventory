@@ -455,9 +455,9 @@ export default function Home() {
   }, [storeBanners]);
 
   return (
-    <div className="container mx-auto px-4 py-8 bg-white text-gray-900 dark:bg-white dark:text-gray-900">
+    <div className="container mx-auto px-4 py-8 bg-white text-gray-900 dark:bg-gray-900 dark:text-white">
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+        <div className="bg-red-900 border border-red-700 text-red-200 px-4 py-3 rounded mb-4">
           {error}
         </div>
       )}
@@ -468,19 +468,19 @@ export default function Home() {
           <input
             type="text"
             placeholder={t('homeSearchPlaceholder')}
-            className="w-full p-4 pr-12 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            className="w-full p-4 pr-12 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-800 dark:text-white dark:border-gray-700 dark:placeholder-gray-400"
           />
-          <button className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-orange-500">
+          <button className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-orange-500 dark:text-gray-400 dark:hover:text-orange-400">
             <Search className="h-5 w-5" />
           </button>
         </div>
       </div>
 
       {/* Bannière principale et catégories */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 dark:bg-white">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 bg-white dark:bg-gray-900">
         {/* Catégories à gauche */}
-        <div className="md:col-span-1 bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-md overflow-hidden dark:from-gray-50 dark:to-white">
-          <div className="p-5 bg-gradient-to-r from-orange-500 to-orange-600">
+        <div className="md:col-span-1 bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-md overflow-hidden dark:from-gray-800 dark:to-gray-900">
+          <div className="p-5 bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-900">
             <h2 className="font-bold text-white text-lg flex items-center">
               <TrendingUp className="h-5 w-5 mr-2" />
               {t('categories')}
@@ -489,9 +489,9 @@ export default function Home() {
           <ul className="py-2">
             {categories.length > 0 ? categories.slice(0, 8).map((category) => (
               <li key={category.id} className="px-2 py-1">
-                <Link href={`/products?category=${category.id}`} className="flex items-center p-3 hover:bg-orange-50 group rounded-lg transition-all duration-200 transform hover:scale-[1.02]">
-                  <div className="w-14 h-14 rounded-lg overflow-hidden mr-3 shadow-sm bg-gradient-to-br from-orange-100 to-orange-50 p-0.5">
-                    <div className="w-full h-full rounded-md overflow-hidden bg-white">
+                <Link href={`/products?category=${category.id}`} className="flex items-center p-3 hover:bg-orange-50 group rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:hover:bg-orange-900">
+                  <div className="w-14 h-14 rounded-lg overflow-hidden mr-3 shadow-sm bg-gradient-to-br from-orange-100 to-orange-50 p-0.5 dark:from-orange-900 dark:to-orange-800">
+                    <div className="w-full h-full rounded-md overflow-hidden bg-white dark:bg-gray-900">
                       <Image 
                         src={category.image || `/images/placeholder-category.jpg`}
                         alt={category.name}
@@ -503,16 +503,16 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex-1">
-                    <span className="text-gray-800 font-medium group-hover:text-orange-600 transition-colors block">{category.name}</span>
+                    <span className="text-gray-800 font-medium group-hover:text-orange-600 transition-colors block dark:text-white dark:group-hover:text-orange-400">{category.name}</span>
                     {category.productCount > 0 && (
-                      <span className="text-xs text-gray-500 flex items-center">
+                      <span className="text-xs text-gray-500 flex items-center dark:text-gray-300">
                         <Award className="h-3 w-3 mr-1 text-orange-400" />
                         {category.productCount} {t('products').toLowerCase()}
                       </span>
                     )}
                   </div>
-                  <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <ChevronRight className="h-4 w-4 text-orange-600" />
+                  <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity dark:bg-orange-900">
+                    <ChevronRight className="h-4 w-4 text-orange-600 dark:text-orange-400" />
                   </div>
                 </Link>
               </li>
@@ -521,18 +521,18 @@ export default function Home() {
               Array.from({ length: 8 }).map((_, index) => (
                 <li key={index} className="px-2 py-1">
                   <div className="flex items-center p-3 animate-pulse">
-                    <div className="w-14 h-14 rounded-lg bg-gray-200 mr-3"></div>
+                    <div className="w-14 h-14 rounded-lg bg-gray-200 mr-3 dark:bg-gray-700"></div>
                     <div className="flex-1">
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2 dark:bg-gray-700"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2 dark:bg-gray-700"></div>
                     </div>
                   </div>
                 </li>
               ))
             )}
           </ul>
-          <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-100">
-            <Link href="/categories" className="flex items-center justify-center bg-white hover:bg-orange-500 text-orange-600 hover:text-white font-medium rounded-lg py-2 px-4 transition-colors shadow-sm">
+          <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-100 dark:from-gray-900 dark:to-gray-800 dark:border-orange-900">
+            <Link href="/categories" className="flex items-center justify-center bg-white hover:bg-orange-500 text-orange-600 hover:text-white font-medium rounded-lg py-2 px-4 transition-colors shadow-sm dark:bg-gray-800 dark:text-orange-400 dark:hover:bg-orange-700 dark:hover:text-white">
               Voir toutes les catégories <ChevronRight className="h-4 w-4 ml-1" />
             </Link>
           </div>
@@ -560,10 +560,10 @@ export default function Home() {
                           priority={index === 0}
                           unoptimized
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent">
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent">
                           <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
                             <h2 className="text-2xl font-bold mb-2">{store.name}</h2>
-                            <Link href={`/store/${store.id}`} className="inline-flex items-center bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+                            <Link href={`/store/${store.id}`} className="inline-flex items-center bg-orange-700 hover:bg-orange-800 text-white px-4 py-2 rounded-lg transition-colors">
                               Visiter la boutique <ChevronRight className="h-4 w-4 ml-1" />
                             </Link>
                           </div>
@@ -577,20 +577,20 @@ export default function Home() {
                 <div className="absolute top-1/2 left-4 transform -translate-y-1/2 z-20">
                   <button 
                     onClick={() => setCurrentBanner(prev => (prev === 0 ? storeBanners.length - 1 : prev - 1))}
-                    className="h-10 w-10 rounded-full bg-white/70 hover:bg-white flex items-center justify-center shadow-md transition-colors"
+                    className="h-10 w-10 rounded-full bg-gray-800/70 hover:bg-gray-900 flex items-center justify-center shadow-md transition-colors"
                     aria-label="Bannière précédente"
                   >
-                    <ChevronLeft className="h-5 w-5 text-gray-800" />
+                    <ChevronLeft className="h-5 w-5 text-white" />
                   </button>
                 </div>
                 
                 <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-20">
                   <button 
                     onClick={() => setCurrentBanner(prev => (prev === storeBanners.length - 1 ? 0 : prev + 1))}
-                    className="h-10 w-10 rounded-full bg-white/70 hover:bg-white flex items-center justify-center shadow-md transition-colors"
+                    className="h-10 w-10 rounded-full bg-gray-800/70 hover:bg-gray-900 flex items-center justify-center shadow-md transition-colors"
                     aria-label="Bannière suivante"
                   >
-                    <ChevronRight className="h-5 w-5 text-gray-800" />
+                    <ChevronRight className="h-5 w-5 text-white" />
                   </button>
                 </div>
                 
@@ -608,7 +608,7 @@ export default function Home() {
               </>
             ) : (
               // État de chargement
-              <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
+              <div className="w-full h-full bg-gray-800 animate-pulse flex items-center justify-center">
                 <div className="text-gray-400">{t('loading') || 'Chargement des bannières...'}</div>
               </div>
             )}
@@ -617,41 +617,41 @@ export default function Home() {
         
         {/* Services à droite */}
         <div className="md:col-span-1 flex flex-col gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-4 rounded-lg shadow-sm dark:bg-gray-800">
             <div className="flex items-start">
-              <div className="mr-3 text-orange-500">
+              <div className="mr-3 text-orange-500 dark:text-orange-400">
                 <span className="text-xl">?</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">{t('helpCenter') || 'CENTRE D\'AIDE'}</h3>
-                <p className="text-xs text-gray-600 mb-2">{t('helpCenterDescription') || 'Guide d\'assistance pour les clients sur la plateforme'}</p>
-                <Link href="/help" className="text-xs text-orange-500 font-medium hover:underline">{t('contactUs')} →</Link>
+                <h3 className="font-semibold text-gray-800 dark:text-white">{t('helpCenter') || 'CENTRE D\'AIDE'}</h3>
+                <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('helpCenterDescription') || 'Guide d\'assistance pour les clients sur la plateforme'}</p>
+                <Link href="/help" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('contactUs')} →</Link>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-4 rounded-lg shadow-sm dark:bg-gray-800">
             <div className="flex items-start">
-              <div className="mr-3 text-orange-500">
+              <div className="mr-3 text-orange-500 dark:text-orange-400">
                 <span className="text-xl">↻</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">{t('easyReturn') || 'RETOUR FACILE'}</h3>
-                <p className="text-xs text-gray-600 mb-2">{t('quickReturns') || 'Retours et remboursements rapides'}</p>
-                <Link href="/returns" className="text-xs text-orange-500 font-medium hover:underline">{t('returnPolicy')} →</Link>
+                <h3 className="font-semibold text-gray-800 dark:text-white">{t('easyReturn') || 'RETOUR FACILE'}</h3>
+                <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('quickReturns') || 'Retours et remboursements rapides'}</p>
+                <Link href="/returns" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('returnPolicy')} →</Link>
               </div>
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-lg shadow-sm">
+          <div className="bg-white p-4 rounded-lg shadow-sm dark:bg-gray-800">
             <div className="flex items-start">
-              <div className="mr-3 text-orange-500">
+              <div className="mr-3 text-orange-500 dark:text-orange-400">
                 <span className="text-xl">💰</span>
               </div>
               <div>
-                <h3 className="font-semibold text-gray-800">{t('becomeSeller')}</h3>
-                <p className="text-xs text-gray-600 mb-2">{t('becomeSellerDescription') || 'Devenez vendeur, fournisseur et partenaire'}</p>
-                <Link href="/become-seller" className="text-xs text-orange-500 font-medium hover:underline">{t('start') || 'Commencer'} →</Link>
+                <h3 className="font-semibold text-gray-800 dark:text-white">{t('becomeSeller')}</h3>
+                <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('becomeSellerDescription') || 'Devenez vendeur, fournisseur et partenaire'}</p>
+                <Link href="/become-seller" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('start') || 'Commencer'} →</Link>
               </div>
             </div>
           </div>

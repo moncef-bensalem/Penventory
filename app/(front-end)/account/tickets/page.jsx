@@ -107,7 +107,7 @@ export default function MyTicketsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="flex justify-center items-center h-64">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
@@ -119,11 +119,11 @@ export default function MyTicketsPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
         <div className="container mx-auto px-4 max-w-6xl">
           <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Connexion requise</h1>
-            <p className="mb-6">Veuillez vous connecter pour accéder à vos tickets de support.</p>
+            <h1 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Connexion requise</h1>
+            <p className="mb-6 text-gray-600 dark:text-gray-300">Veuillez vous connecter pour accéder à vos tickets de support.</p>
             <Link 
               href="/login?redirect=/account/tickets" 
               className="bg-orange-600 text-white px-6 py-2 rounded-md hover:bg-orange-700 transition-colors"
@@ -137,10 +137,10 @@ export default function MyTicketsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="container mx-auto px-4 max-w-6xl">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold">Mes tickets de support</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Mes tickets de support</h1>
           <Link 
             href="/contact" 
             className="bg-orange-600 text-white px-4 py-2 rounded-md flex items-center hover:bg-orange-700 transition-colors"
@@ -150,7 +150,7 @@ export default function MyTicketsPage() {
           </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-8 dark:bg-gray-800">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -159,14 +159,14 @@ export default function MyTicketsPage() {
                 placeholder="Rechercher par sujet, ID ou numéro de commande..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full p-2 border rounded-md"
+                className="pl-10 w-full p-2 border rounded-md bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
               />
             </div>
             <div className="w-full md:w-64">
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
               >
                 <option value="">Tous les statuts</option>
                 <option value="OPEN">Ouvert</option>
@@ -181,30 +181,30 @@ export default function MyTicketsPage() {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b">
-                    <th className="py-3 px-4 text-left">ID</th>
-                    <th className="py-3 px-4 text-left">Sujet</th>
-                    <th className="py-3 px-4 text-left">Statut</th>
-                    <th className="py-3 px-4 text-left">Date de création</th>
-                    <th className="py-3 px-4 text-left">Dernière mise à jour</th>
-                    <th className="py-3 px-4 text-left">Actions</th>
+                  <tr className="border-b border-gray-200 dark:border-gray-700">
+                    <th className="py-3 px-4 text-left text-gray-900 dark:text-white">ID</th>
+                    <th className="py-3 px-4 text-left text-gray-900 dark:text-white">Sujet</th>
+                    <th className="py-3 px-4 text-left text-gray-900 dark:text-white">Statut</th>
+                    <th className="py-3 px-4 text-left text-gray-900 dark:text-white">Date de création</th>
+                    <th className="py-3 px-4 text-left text-gray-900 dark:text-white">Dernière mise à jour</th>
+                    <th className="py-3 px-4 text-left text-gray-900 dark:text-white">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredTickets.map((ticket) => (
-                    <tr key={ticket.id} className="border-b hover:bg-gray-50">
-                      <td className="py-3 px-4 font-mono text-sm">{ticket.id.substring(0, 8)}...</td>
-                      <td className="py-3 px-4">{ticket.subject}</td>
+                    <tr key={ticket.id} className="border-b hover:bg-gray-50 dark:hover:bg-gray-900 border-gray-200 dark:border-gray-700">
+                      <td className="py-3 px-4 font-mono text-sm text-gray-900 dark:text-white">{ticket.id.substring(0, 8)}...</td>
+                      <td className="py-3 px-4 text-gray-900 dark:text-white">{ticket.subject}</td>
                       <td className="py-3 px-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(ticket.status)}`}>
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusBadgeClass(ticket.status)}`}> 
                           {getStatusIcon(ticket.status)}
                           <span className="ml-1">{getStatusLabel(ticket.status)}</span>
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-sm">
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
                         {format(new Date(ticket.createdAt), 'dd MMM yyyy', { locale: fr })}
                       </td>
-                      <td className="py-3 px-4 text-sm">
+                      <td className="py-3 px-4 text-sm text-gray-700 dark:text-gray-300">
                         {format(new Date(ticket.updatedAt), 'dd MMM yyyy', { locale: fr })}
                       </td>
                       <td className="py-3 px-4">
@@ -228,11 +228,11 @@ export default function MyTicketsPage() {
                 </div>
               ) : (
                 <>
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full mb-4">
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full mb-4">
                     <AlertTriangle className="h-8 w-8 text-gray-400" />
                   </div>
-                  <h3 className="text-lg font-medium mb-2">Aucun ticket trouvé</h3>
-                  <p className="text-gray-500 mb-6">
+                  <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">Aucun ticket trouvé</h3>
+                  <p className="text-gray-500 mb-6 dark:text-gray-300">
                     {searchQuery || statusFilter ? 
                       "Aucun ticket ne correspond à vos critères de recherche." : 
                       "Vous n'avez pas encore créé de ticket de support."}
@@ -249,9 +249,9 @@ export default function MyTicketsPage() {
           )}
         </div>
 
-        <div className="bg-gray-100 rounded-lg p-6">
-          <h2 className="text-lg font-medium mb-4">Besoin d'aide ?</h2>
-          <p className="mb-4">
+        <div className="bg-gray-100 rounded-lg p-6 dark:bg-gray-800">
+          <h2 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">Besoin d'aide ?</h2>
+          <p className="mb-4 text-gray-700 dark:text-gray-300">
             Si vous avez des questions ou des problèmes, n'hésitez pas à créer un nouveau ticket de support. 
             Notre équipe vous répondra dans les plus brefs délais.
           </p>
@@ -264,7 +264,7 @@ export default function MyTicketsPage() {
             </Link>
             <Link 
               href="/help" 
-              className="bg-white text-orange-600 border border-orange-600 px-4 py-2 rounded-md hover:bg-orange-50 transition-colors"
+              className="bg-white text-orange-600 border border-orange-600 px-4 py-2 rounded-md hover:bg-orange-50 transition-colors dark:bg-gray-900 dark:text-orange-400 dark:border-orange-400 dark:hover:bg-gray-800"
             >
               Centre d'aide
             </Link>

@@ -199,6 +199,13 @@ function StoreLayoutContent({ children }) {
                       <Link href="/wishlist" className="cursor-pointer">
                         {t('wishlist')}
                       </Link>
+                
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/account/tickets" className="cursor-pointer">
+                        {t('myTickets')}
+                      </Link>
+                
                     </DropdownMenuItem>
                     {user.role === 'ADMIN' && (
                       <DropdownMenuItem asChild>

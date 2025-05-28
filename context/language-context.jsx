@@ -25,6 +25,7 @@ const translations = {
     becomeSeller: 'Devenir Vendeur',
     favorites: 'Favoris',
     wishlist: 'Liste de souhaits',
+    myTickets: 'Mes tickets',
     delivery: 'Livraison',
     myOrders: 'Mes commandes',
     myAccount: 'Mon compte',

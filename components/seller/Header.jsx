@@ -12,11 +12,12 @@ import {
 import { useAuth } from '@/context/auth-context';
 import { signOut } from 'next-auth/react';
 import { useTheme } from 'next-themes';
-import { Bell, Moon, Sun, User } from 'lucide-react';
+import { Bell, Moon, Sun, User, Menu } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import Link from 'next/link';
+import { useState } from 'react';
 
-export default function SellerHeader() {
+export default function SellerHeader({ onMobileMenuToggle }) {
   const { user } = useAuth();
   const { theme, setTheme } = useTheme();
 
@@ -27,6 +28,17 @@ export default function SellerHeader() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-800/95">
       <div className="flex h-16 items-center px-4 sm:px-6">
+        {/* Bouton de menu hamburger pour mobile */}
+        <Button 
+          variant="ghost" 
+          size="icon" 
+          className="md:hidden" 
+          onClick={onMobileMenuToggle}
+        >
+          <Menu className="h-6 w-6" />
+          <span className="sr-only">Menu</span>
+        </Button>
+        
         <div className="ml-auto flex items-center space-x-4">
           {/* Notifications */}
           <DropdownMenu>

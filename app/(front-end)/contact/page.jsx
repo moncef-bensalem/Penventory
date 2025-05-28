@@ -127,15 +127,15 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-12 dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-3xl font-bold text-center mb-2">{t('contactPageTitle')}</h1>
-          <p className="text-center text-gray-600 mb-8">
+          <h1 className="text-3xl font-bold text-center mb-2 text-gray-900 dark:text-white">{t('contactPageTitle')}</h1>
+          <p className="text-center text-gray-600 mb-8 dark:text-gray-300">
             {t('contactPageSubtitle')}
           </p>
 
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="bg-white rounded-lg shadow-md overflow-hidden dark:bg-gray-800">
             <div className="grid grid-cols-1 md:grid-cols-3">
               {/* Informations de contact */}
               <div className="bg-orange-600 text-white p-8">
@@ -186,11 +186,11 @@ export default function ContactPage() {
               <div className="col-span-2 p-8">
                 {!submitted ? (
                   <form onSubmit={handleSubmit} className="space-y-6">
-                    <h2 className="text-xl font-semibold mb-6">{t('sendMessageTitle')}</h2>
+                    <h2 className="text-xl font-semibold mb-6 text-gray-900 dark:text-white">{t('sendMessageTitle')}</h2>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                           {t('fullNameLabel')} <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -199,13 +199,13 @@ export default function ContactPage() {
                           name="name"
                           value={formData.name}
                           onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                           required
                         />
                       </div>
                       
                       <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                           {t('emailLabel')} <span className="text-red-500">*</span>
                         </label>
                         <input
@@ -214,14 +214,14 @@ export default function ContactPage() {
                           name="email"
                           value={formData.email}
                           onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                           required
                         />
                       </div>
                     </div>
                     
                     <div>
-                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                         {t('subjectLabel')} <span className="text-red-500">*</span>
                       </label>
                       <input
@@ -230,13 +230,13 @@ export default function ContactPage() {
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                         required
                       />
                     </div>
                     
                     <div>
-                      <label htmlFor="orderNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="orderNumber" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                         {t('orderNumberLabel')}
                       </label>
                       <input
@@ -245,13 +245,13 @@ export default function ContactPage() {
                         name="orderNumber"
                         value={formData.orderNumber}
                         onChange={handleChange}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                       />
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                           {t('categoryLabel')} <span className="text-red-500">*</span>
                         </label>
                         <select
@@ -259,7 +259,7 @@ export default function ContactPage() {
                           name="category"
                           value={formData.category}
                           onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                           required
                         >
                           {supportCategories.map(category => (
@@ -271,7 +271,7 @@ export default function ContactPage() {
                       </div>
                       
                       <div>
-                        <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                           {t('priorityLabel')} <span className="text-red-500">*</span>
                         </label>
                         <select
@@ -279,7 +279,7 @@ export default function ContactPage() {
                           name="priority"
                           value={formData.priority}
                           onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                           required
                         >
                           {supportPriorities.map(priority => (
@@ -292,7 +292,7 @@ export default function ContactPage() {
                     </div>
                     
                     <div>
-                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                      <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
                         {t('messageLabel')} <span className="text-red-500">*</span>
                       </label>
                       <textarea
@@ -301,7 +301,7 @@ export default function ContactPage() {
                         value={formData.message}
                         onChange={handleChange}
                         rows="5"
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                         required
                       ></textarea>
                     </div>
@@ -318,18 +318,18 @@ export default function ContactPage() {
                   </form>
                 ) : (
                   <div className="text-center py-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6">
-                      <CheckCircle className="h-10 w-10 text-green-600" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-6 dark:bg-green-900">
+                      <CheckCircle className="h-10 w-10 text-green-600 dark:text-green-400" />
                     </div>
-                    <h2 className="text-2xl font-bold mb-4">{t('thankYouTitle')}</h2>
-                    <p className="text-gray-600 mb-6">
+                    <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">{t('thankYouTitle')}</h2>
+                    <p className="text-gray-600 mb-6 dark:text-gray-300">
                       {t('thankYouMessage')}
                     </p>
-                    <div className="bg-gray-100 p-4 rounded-lg mb-6 inline-block">
-                      <p className="text-gray-700 font-medium">{t('referenceNumberLabel')}</p>
+                    <div className="bg-gray-100 p-4 rounded-lg mb-6 inline-block dark:bg-gray-800">
+                      <p className="text-gray-700 font-medium dark:text-gray-200">{t('referenceNumberLabel')}</p>
                       <p className="text-orange-600 font-mono font-bold">{ticketId}</p>
                     </div>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-gray-600 mb-6 dark:text-gray-300">
                       {t('keepReferenceMessage')}
                     </p>
                     <button
@@ -346,34 +346,34 @@ export default function ContactPage() {
           
           {/* FAQ rapide */}
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-center mb-8">{t('faqTitle')}</h2>
+            <h2 className="text-2xl font-bold text-center mb-8 text-gray-900 dark:text-white">{t('faqTitle')}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white p-6 rounded-lg shadow-sm dark:bg-gray-800">
                 <div className="flex items-center mb-4">
                   <MessageSquare className="h-6 w-6 text-orange-600 mr-2" />
-                  <h3 className="font-semibold">{t('trackOrderQuestion')}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{t('trackOrderQuestion')}</h3>
                 </div>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {t('trackOrderAnswer')}
                 </p>
               </div>
               
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white p-6 rounded-lg shadow-sm dark:bg-gray-800">
                 <div className="flex items-center mb-4">
                   <AlertCircle className="h-6 w-6 text-orange-600 mr-2" />
-                  <h3 className="font-semibold">{t('returnPolicyQuestion')}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{t('returnPolicyQuestion')}</h3>
                 </div>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {t('returnPolicyAnswer')}
                 </p>
               </div>
               
-              <div className="bg-white p-6 rounded-lg shadow-sm">
+              <div className="bg-white p-6 rounded-lg shadow-sm dark:bg-gray-800">
                 <div className="flex items-center mb-4">
                   <CreditCard className="h-6 w-6 text-orange-600 mr-2" />
-                  <h3 className="font-semibold">{t('paymentMethodsQuestion')}</h3>
+                  <h3 className="font-semibold text-gray-900 dark:text-white">{t('paymentMethodsQuestion')}</h3>
                 </div>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-300">
                   {t('paymentMethodsAnswer')}
                 </p>
               </div>

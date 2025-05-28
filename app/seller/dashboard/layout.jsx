@@ -8,6 +8,7 @@ import SellerSidebar from '@/components/seller/Sidebar';
 import SellerHeader from '@/components/seller/Header';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
+import { X } from 'lucide-react';
 
 export default function SellerDashboardLayout({ children }) {
   const { user, loading } = useAuth();
@@ -15,6 +16,7 @@ export default function SellerDashboardLayout({ children }) {
   const [store, setStore] = useState(null);
   const [storeStatus, setStoreStatus] = useState(null);
   const [checkingAccess, setCheckingAccess] = useState(true);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!loading) {
@@ -146,6 +148,11 @@ export default function SellerDashboardLayout({ children }) {
     );
   }
 
+  // Fonction pour basculer le menu mobile
+  const toggleMobileMenu = () => {
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   return (
     <div className="h-full relative">
       {/* Sidebar desktop */}
@@ -153,9 +160,35 @@ export default function SellerDashboardLayout({ children }) {
         <SellerSidebar />
       </div>
 
+      {/* Sidebar mobile (drawer) */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-[100] flex md:hidden">
+          {/* Overlay sombre */}
+          <div 
+            className="fixed inset-0 bg-black/50"
+            onClick={toggleMobileMenu}
+            aria-hidden="true"
+          />
+          
+          {/* Drawer */}
+          <div className="relative w-4/5 max-w-xs bg-white dark:bg-gray-800 h-full overflow-y-auto">
+            {/* Bouton de fermeture */}
+            <button
+              className="absolute top-4 right-4 p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              onClick={toggleMobileMenu}
+            >
+              <X className="h-6 w-6" />
+              <span className="sr-only">Fermer le menu</span>
+            </button>
+            
+            <SellerSidebar />
+          </div>
+        </div>
+      )}
+
       {/* Contenu principal */}
       <div className="md:pl-64 flex flex-col min-h-screen">
-        <SellerHeader store={store} />
+        <SellerHeader store={store} onMobileMenuToggle={toggleMobileMenu} />
         <main className="flex-1 p-6 bg-gradient-to-br from-orange-50 to-orange-100 dark:from-gray-900 dark:to-gray-800">
           {children}
         </main>

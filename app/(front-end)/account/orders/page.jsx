@@ -12,7 +12,8 @@ import {
   CheckCircle,
   XCircle,
   Truck,
-  Package
+  Package,
+  AlertTriangle
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { format } from 'date-fns';
@@ -24,6 +25,8 @@ export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
   
   useEffect(() => {
     fetchOrders();
@@ -55,6 +58,53 @@ export default function OrdersPage() {
     } finally {
       setLoading(false);
     }
+  };
+  
+  // Fonction pour annuler une commande
+  const handleCancelOrder = async () => {
+    if (!cancellingOrderId) return;
+    
+    try {
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId: cancellingOrderId }),
+      });
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.error || 'Erreur lors de l\'annulation de la commande');
+      }
+      
+      // Mettre à jour la liste des commandes
+      setOrders(orders.map(order => 
+        order.id === cancellingOrderId 
+          ? { ...order, status: 'CANCELLED', paymentStatus: order.paymentStatus === 'PAID' ? 'REFUNDED' : 'CANCELLED' }
+          : order
+      ));
+      
+      toast.success('Commande annulée avec succès');
+      setShowCancelModal(false);
+      setCancellingOrderId(null);
+    } catch (error) {
+      console.error('Erreur lors de l\'annulation:', error);
+      toast.error(error.message || 'Erreur lors de l\'annulation de la commande');
+    }
+  };
+  
+  // Ouvrir la modal de confirmation d'annulation
+  const openCancelModal = (orderId) => {
+    setCancellingOrderId(orderId);
+    setShowCancelModal(true);
+  };
+  
+  // Fermer la modal de confirmation
+  const closeCancelModal = () => {
+    setShowCancelModal(false);
+    setCancellingOrderId(null);
   };
   
   // Fonction pour obtenir l'icône et la couleur en fonction du statut
@@ -114,6 +164,11 @@ export default function OrdersPage() {
         icon: XCircle, 
         label: 'Annulée',
         color: 'bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-300' 
+      },
+      'REFUNDED': { 
+        icon: XCircle, 
+        label: 'Remboursée',
+        color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-300' 
       }
     };
     
@@ -264,7 +319,7 @@ export default function OrdersPage() {
                         <div className="flex-1">
                           <p className="font-medium truncate">{item.product?.name || 'Produit'}</p>
                           <p className="text-sm text-gray-500 dark:text-gray-400">
-                            Qté: {item.quantity} × {item.price.toFixed(2)}€
+                            Qté: {item.quantity} × {item.price.toFixed(2)} DT
                           </p>
                         </div>
                       </div>
@@ -276,11 +331,23 @@ export default function OrdersPage() {
                     )}
                   </div>
                   
-                  {/* Bouton de suivi */}
-                  <div className="mt-6 text-right">
+                  {/* Boutons d'action */}
+                  <div className="mt-6 flex justify-between items-center">
+                    {/* Bouton d'annulation - visible uniquement si la commande peut être annulée */}
+                    {!['DELIVERED', 'LIVREE', 'CANCELLED', 'ANNULEE'].includes(order.status) && (
+                      <button
+                        onClick={() => openCancelModal(order.id)}
+                        className="inline-flex items-center text-red-600 hover:text-red-700 font-medium"
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Annuler ma commande
+                      </button>
+                    )}
+                    
+                    {/* Bouton de suivi */}
                     <Link
                       href={`/account/orders/${order.id}`}
-                      className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium"
+                      className="inline-flex items-center text-orange-600 hover:text-orange-700 font-medium ml-auto"
                     >
                       Suivre ma commande
                       <ChevronRight className="h-4 w-4 ml-1" />
@@ -290,6 +357,42 @@ export default function OrdersPage() {
               </div>
             );
           })}
+        </div>
+      )}
+      
+      {/* Modal de confirmation d'annulation */}
+      {showCancelModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center text-red-600 mb-4">
+              <AlertTriangle className="h-6 w-6 mr-2" />
+              <h3 className="text-lg font-bold">Confirmer l'annulation</h3>
+            </div>
+            
+            <p className="mb-6 text-gray-700 dark:text-gray-300">
+              Êtes-vous sûr de vouloir annuler cette commande ? Cette action est irréversible.
+              {orders.find(o => o.id === cancellingOrderId)?.paymentStatus === 'PAID' && (
+                <span className="block mt-2 font-medium">
+                  Le montant payé sera automatiquement remboursé sur votre carte bancaire.
+                </span>
+              )}
+            </p>
+            
+            <div className="flex justify-end space-x-3">
+              <button
+                onClick={closeCancelModal}
+                className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={handleCancelOrder}
+                className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+              >
+                Confirmer l'annulation
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
