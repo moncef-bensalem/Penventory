@@ -479,62 +479,66 @@ export default function Home() {
       {/* Bannière principale et catégories */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8 bg-white dark:bg-gray-900">
         {/* Catégories à gauche */}
-        <div className="md:col-span-1 bg-gradient-to-b from-gray-50 to-white rounded-xl shadow-md overflow-hidden dark:from-gray-800 dark:to-gray-900">
-          <div className="p-5 bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-900">
-            <h2 className="font-bold text-white text-lg flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2" />
-              {t('categories')}
-            </h2>
-          </div>
-          <ul className="py-2">
-            {categories.length > 0 ? categories.slice(0, 8).map((category) => (
-              <li key={category.id} className="px-2 py-1">
-                <Link href={`/products?category=${category.id}`} className="flex items-center p-3 hover:bg-orange-50 group rounded-lg transition-all duration-200 transform hover:scale-[1.02] dark:hover:bg-orange-900">
-                  <div className="w-14 h-14 rounded-lg overflow-hidden mr-3 shadow-sm bg-gradient-to-br from-orange-100 to-orange-50 p-0.5 dark:from-orange-900 dark:to-orange-800">
-                    <div className="w-full h-full rounded-md overflow-hidden bg-white dark:bg-gray-900">
-                      <Image 
-                        src={category.image || `/images/placeholder-category.jpg`}
-                        alt={category.name}
-                        width={56}
-                        height={56}
-                        className="object-cover w-full h-full"
-                        unoptimized
-                      />
+        <div className="md:col-span-1 relative">
+          <div className="relative overflow-hidden rounded-2xl shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-orange-200 dark:border-orange-900 group transition-all duration-300 hover:shadow-2xl">
+            {/* Accent orange à gauche */}
+            <div className="absolute top-0 left-0 h-full w-1.5 bg-gradient-to-b from-orange-500 to-orange-300 shadow-lg rounded-r-xl animate-pulse"></div>
+            <div className="p-5 bg-gradient-to-r from-orange-500 to-orange-600 dark:from-orange-700 dark:to-orange-900 rounded-t-2xl">
+              <h2 className="font-bold text-white text-lg flex items-center">
+                <TrendingUp className="h-5 w-5 mr-2" />
+                {t('categories')}
+              </h2>
+            </div>
+            <ul className="py-2">
+              {categories.length > 0 ? categories.slice(0, 8).map((category) => (
+                <li key={category.id} className="px-2 py-1">
+                  <Link href={`/products?category=${category.id}`} className="flex items-center p-3 rounded-xl hover:bg-orange-50 dark:hover:bg-orange-900 transition-all duration-200 group">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden mr-3 shadow-sm bg-gradient-to-br from-orange-100 to-orange-50 p-0.5 dark:from-orange-900 dark:to-orange-800">
+                      <div className="w-full h-full rounded-md overflow-hidden bg-white dark:bg-gray-900">
+                        <Image 
+                          src={category.image || `/images/placeholder-category.jpg`}
+                          alt={category.name}
+                          width={56}
+                          height={56}
+                          className="object-cover w-full h-full"
+                          unoptimized
+                        />
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex-1">
-                    <span className="text-gray-800 font-medium group-hover:text-orange-600 transition-colors block dark:text-white dark:group-hover:text-orange-400">{category.name}</span>
-                    {category.productCount > 0 && (
-                      <span className="text-xs text-gray-500 flex items-center dark:text-gray-300">
-                        <Award className="h-3 w-3 mr-1 text-orange-400" />
-                        {category.productCount} {t('products').toLowerCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity dark:bg-orange-900">
-                    <ChevronRight className="h-4 w-4 text-orange-600 dark:text-orange-400" />
-                  </div>
-                </Link>
-              </li>
-            )) : (
-              // État de chargement
-              Array.from({ length: 8 }).map((_, index) => (
-                <li key={index} className="px-2 py-1">
-                  <div className="flex items-center p-3 animate-pulse">
-                    <div className="w-14 h-14 rounded-lg bg-gray-200 mr-3 dark:bg-gray-700"></div>
                     <div className="flex-1">
-                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2 dark:bg-gray-700"></div>
-                      <div className="h-3 bg-gray-200 rounded w-1/2 dark:bg-gray-700"></div>
+                      <span className="text-gray-800 font-medium group-hover:text-orange-600 transition-colors block dark:text-white dark:group-hover:text-orange-400">{category.name}</span>
+                      {category.productCount > 0 && (
+                        <span className="text-xs text-gray-500 flex items-center dark:text-gray-300">
+                          <Award className="h-3 w-3 mr-1 text-orange-400" />
+                          {category.productCount} {t('products').toLowerCase()}
+                        </span>
+                      )}
                     </div>
-                  </div>
+                    <div className="h-8 w-8 rounded-full bg-orange-100 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity dark:bg-orange-900">
+                      <ChevronRight className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                    </div>
+                  </Link>
                 </li>
-              ))
-            )}
-          </ul>
-          <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-100 dark:from-gray-900 dark:to-gray-800 dark:border-orange-900">
-            <Link href="/categories" className="flex items-center justify-center bg-white hover:bg-orange-500 text-orange-600 hover:text-white font-medium rounded-lg py-2 px-4 transition-colors shadow-sm dark:bg-gray-800 dark:text-orange-400 dark:hover:bg-orange-700 dark:hover:text-white">
-              Voir toutes les catégories <ChevronRight className="h-4 w-4 ml-1" />
-            </Link>
+              )) : (
+                // État de chargement
+                Array.from({ length: 8 }).map((_, index) => (
+                  <li key={index} className="px-2 py-1">
+                    <div className="flex items-center p-3 animate-pulse">
+                      <div className="w-14 h-14 rounded-lg bg-gray-200 mr-3 dark:bg-gray-700"></div>
+                      <div className="flex-1">
+                        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2 dark:bg-gray-700"></div>
+                        <div className="h-3 bg-gray-200 rounded w-1/2 dark:bg-gray-700"></div>
+                      </div>
+                    </div>
+                  </li>
+                ))
+              )}
+            </ul>
+            <div className="p-4 bg-gradient-to-r from-orange-50 to-orange-100 border-t border-orange-100 dark:from-gray-900 dark:to-gray-800 dark:border-orange-900 rounded-b-2xl">
+              <Link href="/categories" className="flex items-center justify-center bg-white hover:bg-orange-500 text-orange-600 hover:text-white font-medium rounded-lg py-2 px-4 transition-colors shadow-sm dark:bg-gray-800 dark:text-orange-400 dark:hover:bg-orange-700 dark:hover:text-white">
+                Voir toutes les catégories <ChevronRight className="h-4 w-4 ml-1" />
+              </Link>
+            </div>
           </div>
         </div>
         
@@ -616,55 +620,46 @@ export default function Home() {
         </div>
         
         {/* Services à droite */}
-        <div className="md:col-span-1 flex flex-col gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm dark:bg-gray-800">
-            <div className="flex items-start">
-              <div className="mr-3 text-orange-500 dark:text-orange-400">
-                <span className="text-xl">?</span>
+        <div className="md:col-span-1 relative">
+          <div className="relative overflow-hidden rounded-2xl shadow-xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border border-orange-200 dark:border-orange-900 group transition-all duration-300 hover:shadow-2xl">
+            {/* Accent orange à droite */}
+            <div className="absolute top-0 right-0 h-full w-1.5 bg-gradient-to-b from-orange-500 to-orange-300 shadow-lg rounded-l-xl animate-pulse"></div>
+            <div className="flex flex-col gap-4 p-4">
+              <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl p-4 shadow-sm flex items-start">
+                <div className="mr-3 text-orange-500 dark:text-orange-400 text-2xl">?</div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 dark:text-white">{t('helpCenter') || 'CENTRE D\'AIDE'}</h3>
+                  <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('helpCenterDescription') || 'Guide d\'assistance pour les clients sur la plateforme'}</p>
+                  <Link href="/help" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('contactUs')} →</Link>
+                </div>
               </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white">{t('helpCenter') || 'CENTRE D\'AIDE'}</h3>
-                <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('helpCenterDescription') || 'Guide d\'assistance pour les clients sur la plateforme'}</p>
-                <Link href="/help" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('contactUs')} →</Link>
+              <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl p-4 shadow-sm flex items-start">
+                <div className="mr-3 text-orange-500 dark:text-orange-400 text-2xl">↻</div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 dark:text-white">{t('easyReturn') || 'RETOUR FACILE'}</h3>
+                  <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('quickReturns') || 'Retours et remboursements rapides'}</p>
+                  <Link href="/returns" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('returnPolicy')} →</Link>
+                </div>
+              </div>
+              <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl p-4 shadow-sm flex items-start">
+                <div className="mr-3 text-orange-500 dark:text-orange-400 text-2xl">💰</div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 dark:text-white">{t('becomeSeller')}</h3>
+                  <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('becomeSellerDescription') || 'Devenez vendeur, fournisseur et partenaire'}</p>
+                  <Link href="/become-seller" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('start') || 'Commencer'} →</Link>
+                </div>
+              </div>
+              <div className="mt-2 flex justify-center">
+                <Image 
+                  src="/images/add.gif" 
+                  alt="Brain Reading" 
+                  width={120} 
+                  height={120} 
+                  className="object-contain"
+                  unoptimized
+                />
               </div>
             </div>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm dark:bg-gray-800">
-            <div className="flex items-start">
-              <div className="mr-3 text-orange-500 dark:text-orange-400">
-                <span className="text-xl">↻</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white">{t('easyReturn') || 'RETOUR FACILE'}</h3>
-                <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('quickReturns') || 'Retours et remboursements rapides'}</p>
-                <Link href="/returns" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('returnPolicy')} →</Link>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm dark:bg-gray-800">
-            <div className="flex items-start">
-              <div className="mr-3 text-orange-500 dark:text-orange-400">
-                <span className="text-xl">💰</span>
-              </div>
-              <div>
-                <h3 className="font-semibold text-gray-800 dark:text-white">{t('becomeSeller')}</h3>
-                <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('becomeSellerDescription') || 'Devenez vendeur, fournisseur et partenaire'}</p>
-                <Link href="/become-seller" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('start') || 'Commencer'} →</Link>
-              </div>
-            </div>
-          </div>
-          
-          <div className="mt-2 flex justify-center">
-            <Image 
-              src="/images/brain-reading.png" 
-              alt="Brain Reading" 
-              width={120} 
-              height={120} 
-              className="object-contain"
-              unoptimized
-            />
           </div>
         </div>
       </div>
@@ -742,33 +737,33 @@ export default function Home() {
             if (categoryProducts.length === 0) return null;
             
             return (
-              <div key={category.id} className="mb-10 bg-white rounded-lg shadow-sm overflow-hidden dark:bg-white">
-                <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-100">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-3 dark:bg-orange-100">
-                      <span className="text-orange-500 text-xs font-bold dark:text-orange-500">{category.name.charAt(0)}</span>
+              <div key={category.id} className="mb-6 bg-white/90 dark:bg-gray-900/90 rounded-2xl shadow-xl border border-orange-100 dark:border-orange-900 overflow-hidden group transition-all duration-300 hover:shadow-2xl">
+                <div className="flex items-center justify-between px-4 py-2 border-b border-gray-100 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 rounded-t-2xl relative">
+                  {/* Accent orange à gauche */}
+                  <div className="absolute left-0 top-2 bottom-2 w-1.5 bg-gradient-to-b from-orange-500 to-orange-300 rounded-r-xl shadow-md animate-pulse"></div>
+                  <div className="flex items-center pl-4">
+                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-3 dark:bg-orange-900 text-orange-500 font-bold text-base">
+                      {category.name.charAt(0)}
                     </div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-gray-900">{category.name}</h2>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white tracking-tight">{category.name}</h2>
                   </div>
-                  <Link href={`/categories/${category.id}`} className="bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors dark:bg-orange-500 dark:text-white dark:hover:bg-orange-600">
-                    See All
+                  <Link href={`/products?category=${category.id}`} className="ml-auto flex items-center gap-1 bg-orange-500 hover:bg-orange-600 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors shadow-sm">
+                    {t('seeAll') || 'See All'}
+                    <ChevronRight className="h-4 w-4" />
                   </Link>
                 </div>
-
                 <div className="p-4">
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
                     {loading ? (
                       // État de chargement
                       Array.from({ length: 6 }).map((_, idx) => (
-                        <div key={idx} className="bg-gray-100 rounded-lg overflow-hidden aspect-square animate-pulse">
-                          <div className="h-full w-full"></div>
-                        </div>
+                        <div key={idx} className="bg-gray-100 rounded-xl overflow-hidden aspect-square animate-pulse"></div>
                       ))
                     ) : categoryProducts.length > 0 ? (
                       // Produits de la catégorie
                       categoryProducts.map((product) => (
                         <Link key={product.id} href={`/products/${product.id}`} className="group block">
-                          <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1">
+                          <div className="bg-white dark:bg-gray-800 rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform group-hover:-translate-y-1">
                             <div className="relative aspect-square overflow-hidden">
                               <Image 
                                 src={product.images[0]} 
@@ -782,23 +777,23 @@ export default function Home() {
                                   -{product.discount}%
                                 </div>
                               )}
-                              <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                              <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                <div className="bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
+                                <div className="bg-white/80 backdrop-blur-sm rounded-full p-2 shadow-md transform translate-y-2 group-hover:translate-y-0 transition-all duration-300">
                                   <ShoppingBag className="h-5 w-5 text-orange-600" />
                                 </div>
                               </div>
                             </div>
-                            <div className="p-4">
-                              <h3 className="font-medium text-gray-900 line-clamp-1 group-hover:text-orange-600 transition-colors">{product.name}</h3>
-                              <div className="flex items-center justify-between mt-2">
+                            <div className="p-2">
+                              <h3 className="font-medium text-gray-900 dark:text-white text-sm line-clamp-1 group-hover:text-orange-600 transition-colors">{product.name}</h3>
+                              <div className="flex items-center justify-between mt-1">
                                 {product.discount > 0 ? (
                                   <div className="flex flex-col">
-                                    <span className="text-sm font-bold text-orange-600">{(product.price * (1 - product.discount / 100)).toFixed(2)} DT</span>
+                                    <span className="text-xs font-bold text-orange-600">{(product.price * (1 - product.discount / 100)).toFixed(2)} DT</span>
                                     <span className="text-xs text-gray-500 line-through">{product.price.toFixed(2)} DT</span>
                                   </div>
                                 ) : (
-                                  <span className="text-sm font-bold text-gray-900">{product.price.toFixed(2)} DT</span>
+                                  <span className="text-xs font-bold text-gray-900 dark:text-white">{product.price.toFixed(2)} DT</span>
                                 )}
                                 <div className="h-6 w-6 rounded-full bg-orange-100 flex items-center justify-center">
                                   <ChevronRight className="h-3 w-3 text-orange-600" />

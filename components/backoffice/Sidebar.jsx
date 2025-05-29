@@ -92,11 +92,7 @@ export default function Sidebar({showSideBar = true, setShowSideBar = () => {}})
       icon: UserPen,
       route: '/dashboard/staff'
     },
-    {
-      title: 'Communauté',
-      icon: Building2,
-      route: '/dashboard/community'
-    },
+
     {
       title: 'Portefeuille',
       icon: Wallet,

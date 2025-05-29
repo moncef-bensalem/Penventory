@@ -372,18 +372,28 @@ export default function TicketDetailPage({ params }) {
     }
   };
 
-  const handleStatusChange = (status) => {
-    // Mettre à jour le statut du ticket
-    const updatedTicket = {
-      ...ticket,
-      status: status,
-      lastUpdated: new Date()
-    };
-    
-    setTicket(updatedTicket);
-    setEditedTicket(updatedTicket);
-    
-    toast.success(`Statut mis à jour: ${getStatusLabel(status)}`);
+  const handleStatusChange = async (status) => {
+    try {
+      setIsSubmitting(true);
+      // PATCH API pour changer le statut
+      const response = await fetch(`/api/tickets/${ticket.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Erreur lors de la mise à jour du statut');
+      }
+      toast.success(`Statut mis à jour: ${getStatusLabel(status)}`);
+      // Refetch les données du ticket pour garantir la persistance
+      fetchTicketDetails();
+    } catch (error) {
+      console.error('Erreur lors du changement de statut:', error);
+      toast.error('Erreur lors du changement de statut');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Fonctions utilitaires
@@ -659,7 +669,7 @@ export default function TicketDetailPage({ params }) {
                   />
                 </div>
                 <div>
-                  <h3 className="font-medium">{ticket.customer.name}</h3>
+                  <h3 className="font-medium text-gray-900 dark:!text-white">{ticket.customer.name}</h3>
                   <p className="text-sm text-gray-500">{ticket.customer.email}</p>
                 </div>
               </div>
@@ -682,7 +692,7 @@ export default function TicketDetailPage({ params }) {
                     variant={ticket.status === status ? "default" : "outline"}
                     className={`w-full justify-start ${ticket.status === status ? 'bg-orange-600 hover:bg-orange-700' : ''}`}
                     onClick={() => handleStatusChange(status)}
-                    disabled={ticket.status === status}
+                    disabled={ticket.status === status || isSubmitting}
                   >
                     {getStatusIcon(status)}
                     <span className="ml-2">Marquer comme {getStatusLabel(status).toLowerCase()}</span>
@@ -720,8 +730,8 @@ export default function TicketDetailPage({ params }) {
                     <div 
                       className={`max-w-3/4 rounded-lg p-4 ${
                         message.sender.role === 'STAFF' 
-                          ? 'bg-orange-50 border border-orange-100' 
-                          : 'bg-gray-50 border border-gray-100'
+                          ? 'bg-orange-50 border border-orange-100 dark:bg-gray-800 dark:border-gray-700' 
+                          : 'bg-gray-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800'
                       }`}
                     >
                       <div className="flex items-center mb-2">
@@ -734,22 +744,13 @@ export default function TicketDetailPage({ params }) {
                           />
                         </div>
                         <div>
-                          <h3 className="font-medium text-sm">
-                            {message.sender.name}
-                            <span className={`ml-2 text-xs px-2 py-0.5 rounded-full ${
-                              message.sender.role === 'STAFF' 
-                                ? 'bg-orange-100 text-orange-800' 
-                                : 'bg-blue-100 text-blue-800'
-                            }`}>
-                              {message.sender.role === 'STAFF' ? 'Support' : 'Client'}
-                            </span>
-                          </h3>
-                          <p className="text-xs text-gray-500">
+                          <h3 className="font-medium text-gray-900 dark:text-white">{message.sender.name}</h3>
+                          <p className="text-xs text-gray-500 dark:text-gray-300">
                             {format(new Date(message.createdAt), 'dd MMM yyyy à HH:mm', { locale: fr })}
                           </p>
                         </div>
                       </div>
-                      <div className="mt-2 whitespace-pre-wrap">{message.content}</div>
+                      <div className="mt-2 whitespace-pre-wrap text-gray-900 dark:text-gray-100">{message.content}</div>
                       {message.attachments && message.attachments.length > 0 && (
                         <div className="mt-3 pt-3 border-t border-gray-200">
                           <h4 className="text-sm font-medium mb-2">Pièces jointes:</h4>

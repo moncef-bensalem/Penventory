@@ -4,9 +4,9 @@ import { authOptions } from '@/lib/auth';
 import prisma from '@/lib/prisma';
 
 // GET /api/tickets/[id] - Récupérer un ticket spécifique
-export async function GET(request, { params }) {
+export async function GET(request, context) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const session = await getServerSession(authOptions);
     
     if (!session) {
@@ -73,9 +73,9 @@ export async function GET(request, { params }) {
 }
 
 // PATCH /api/tickets/[id] - Mettre à jour un ticket
-export async function PATCH(request, { params }) {
+export async function PATCH(request, context) {
   try {
-    const { id } = params;
+    const { id } = await context.params;
     const session = await getServerSession(authOptions);
     
     if (!session) {
