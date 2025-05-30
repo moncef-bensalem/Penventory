@@ -10,12 +10,14 @@ import { FcGoogle } from "react-icons/fc";
 import { Logo } from "@/components/ui/logo";
 import PasswordStrengthMeter from "@/components/ui/password-strength-meter";
 import { validatePassword, logPasswordEvent } from "@/lib/password-validator";
+import { Eye, EyeOff } from 'lucide-react';
 
 export default function RegisterClient() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [password, setPassword] = useState("");
   const [isPasswordValid, setIsPasswordValid] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   
   const {
     register,
@@ -164,16 +166,29 @@ export default function RegisterClient() {
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                 Mot de passe
               </label>
-              <input
-                id="password"
-                type="password"
-                {...register("password", {
-                  required: "Le mot de passe est requis",
-                  validate: (value) => validatePassword(value) || "Ce mot de passe ne répond pas aux critères de sécurité"
-                })}
-                className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
-                disabled={isLoading}
-              />
+              <div className="relative mt-1">
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  {...register("password", {
+                    required: "Le mot de passe est requis",
+                    validate: (value) => validatePassword(value) || "Ce mot de passe ne répond pas aux critères de sécurité"
+                  })}
+                  className="mt-1 block w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-orange-500 focus:border-orange-500"
+                  disabled={isLoading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-500 dark:hover:text-gray-300"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
+              </div>
               {errors.password && (
                 <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
               )}

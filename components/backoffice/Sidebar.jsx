@@ -49,11 +49,7 @@ export default function Sidebar({showSideBar = true, setShowSideBar = () => {}})
       icon: BadgePercent,
       route: '/dashboard/catalogue/promotions'
     },
-    {
-      title: 'Bannières',
-      icon: MonitorPlay,
-      route: '/dashboard/catalogue/banners'
-    },
+
     {
       title: 'Bannières Magasins',
       icon: ImageIcon,

@@ -153,12 +153,90 @@ export default function OrderDetailsPage() {
     }
   };
 
-  // Exporter la commande en PDF (simulation)
-  const exportToPDF = () => {
-    toast('Export PDF en cours de développement', {
-      icon: '📄',
-      duration: 3000
-    });
+  // Exporter la commande en PDF
+  const exportToPDF = async () => {
+    if (!order) return;
+    
+    try {
+      const { default: jsPDF } = await import('jspdf');
+      const autoTable = (await import('jspdf-autotable')).default;
+      
+      const doc = new jsPDF();
+      
+      // En-tête
+      doc.setFontSize(18);
+      doc.text('Détails de la commande', 14, 18);
+      
+      // Informations de base
+      doc.setFontSize(12);
+      doc.text(`Numéro de commande: ${order.number}`, 14, 30);
+      doc.text(`Date: ${format(new Date(order.createdAt), 'dd MMMM yyyy à HH:mm', { locale: fr })}`, 14, 38);
+      doc.text(`Statut: ${order.statusLabel}`, 14, 46);
+      doc.text(`Paiement: ${getPaymentStatusLabel(order.paymentStatus)}`, 14, 54);
+      
+      // Informations client
+      doc.text('Informations client:', 14, 66);
+      doc.text(`Nom: ${order.customer?.name || 'Non disponible'}`, 14, 74);
+      doc.text(`Email: ${order.customer?.email || 'Non disponible'}`, 14, 82);
+      doc.text(`Téléphone: ${order.customer?.phone || 'Non disponible'}`, 14, 90);
+      
+      // Adresse de livraison
+      if (order.shippingAddress) {
+        doc.text('Adresse de livraison:', 14, 102);
+        doc.text(`${order.shippingAddress.name}`, 14, 110);
+        doc.text(`${order.shippingAddress.address}`, 14, 118);
+        doc.text(`${order.shippingAddress.postalCode} ${order.shippingAddress.city}`, 14, 126);
+        doc.text(`${order.shippingAddress.country}`, 14, 134);
+      }
+      
+      // Articles commandés
+      doc.text('Articles commandés:', 14, 146);
+      
+      const tableColumn = ['Produit', 'Quantité', 'Prix unitaire', 'Total'];
+      const tableRows = order.items.map(item => [
+        item.product?.name || 'Produit inconnu',
+        item.quantity.toString(),
+        `${item.price.toFixed(2)} DT`,
+        `${(item.price * item.quantity).toFixed(2)} DT`
+      ]);
+      
+      // Ajouter le total
+      tableRows.push(['', '', 'Total', `${order.total.toFixed(2)} DT`]);
+      
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 152,
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [255, 140, 0] },
+        margin: { left: 14, right: 14 },
+        columnStyles: {
+          0: { cellWidth: 80 },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 40 },
+          3: { cellWidth: 40 }
+        }
+      });
+      
+      // Pied de page
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.text(
+          `Page ${i} sur ${pageCount}`,
+          doc.internal.pageSize.width / 2,
+          doc.internal.pageSize.height - 10,
+          { align: 'center' }
+        );
+      }
+      
+      doc.save(`commande_${order.number}.pdf`);
+      toast.success('Export PDF réussi');
+    } catch (error) {
+      console.error('Erreur lors de l\'export PDF:', error);
+      toast.error('Erreur lors de l\'export PDF');
+    }
   };
 
   if (authLoading || loading) {

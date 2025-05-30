@@ -638,7 +638,7 @@ export default function Home() {
                 <div>
                   <h3 className="font-semibold text-gray-800 dark:text-white">{t('easyReturn') || 'RETOUR FACILE'}</h3>
                   <p className="text-xs text-gray-600 mb-2 dark:text-gray-300">{t('quickReturns') || 'Retours et remboursements rapides'}</p>
-                  <Link href="/returns" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('returnPolicy')} →</Link>
+                  <Link href="/privacy" className="text-xs text-orange-500 font-medium hover:underline dark:text-orange-400">{t('returnPolicy')} →</Link>
                 </div>
               </div>
               <div className="bg-white/90 dark:bg-gray-800/90 rounded-xl p-4 shadow-sm flex items-start">

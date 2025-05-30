@@ -315,12 +315,25 @@ export default function CustomersPage() {
     {
       accessorKey: "address",
       header: "Adresse",
-      cell: ({ row }) => (
-        <div className="flex items-center max-w-xs truncate">
-          <MapPin className="h-4 w-4 mr-2 text-gray-400 flex-shrink-0" />
-          <span className="truncate">{row.original.address || 'Non renseignée'}</span>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const address = row.original.address;
+        if (!address) return <span className="truncate">Non renseignée</span>;
+        if (typeof address === "string") return <span className="truncate">{address}</span>;
+        if (typeof address === "object") {
+          return (
+            <span className="truncate">
+              {[
+                address.name,
+                address.address,
+                address.city,
+                address.postalCode,
+                address.country
+              ].filter(Boolean).join(", ")}
+            </span>
+          );
+        }
+        return <span className="truncate">Non renseignée</span>;
+      },
     },
     {
       accessorKey: "formattedCreatedAt",

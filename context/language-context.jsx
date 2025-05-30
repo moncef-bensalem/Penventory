@@ -34,6 +34,8 @@ const translations = {
     administration: 'Administration',
     management: 'Gestion',
     sellerSpace: 'Espace vendeur',
+    easyReturn: 'RETOUR FACILE',
+    quickReturns: 'Retours et remboursements rapides',
     
     // Actions
     search: 'Rechercher',
@@ -501,7 +503,7 @@ const translations = {
     faqSellersQuestion1: "Comment devenir vendeur sur PInventory ?",
     faqSellersAnswer1: "Pour devenir vendeur sur PInventory, cliquez sur 'Devenir vendeur' en haut de la page, puis suivez les étapes d'inscription. Vous devrez fournir des informations sur votre entreprise, vos coordonnées bancaires et fiscales.",
     faqSellersQuestion2: "Quels sont les frais pour vendre sur PInventory ?",
-    faqSellersAnswer2: "PInventory prélève une commission de 5% sur chaque vente réalisée sur la plateforme. Il n'y a pas de frais d'inscription ou d'abonnement mensuel.",
+    faqSellersAnswer2: "Penventory prélève une commission de 5% sur chaque vente réalisée sur la plateforme. Il n'y a pas de frais d'inscription ou d'abonnement mensuel.",
     faqSellersQuestion3: "Comment sont gérés les paiements ?",
     faqSellersAnswer3: "Les paiements sont sécurisés et traités par notre système. Une fois qu'une commande est livrée et confirmée par le client, vous pouvez demander un virement sur votre compte bancaire. Les paiements sont généralement traités sous 3 jours ouvrables.",
     faqSellersQuestion4: "Comment gérer mes produits et commandes ?",
@@ -695,6 +697,8 @@ const translations = {
     administration: 'Administration',
     management: 'Management',
     sellerSpace: 'Seller Space',
+    RETOURFACILE:"Returneasy",
+    RETOURSETREMBOURSEMENTSRAPIDES:"quickReturns",
     
     // Actions
     search: 'Search',
@@ -804,6 +808,7 @@ const translations = {
     helpSectionDescription: 'If you have questions about the selling process, don\'t hesitate to contact us. We\'re here to help!',
     helpCenter: 'Help Center',
     liveChat: 'Live Chat',
+  
     
     // Help Page
     helpPageTitle: 'Help Center',

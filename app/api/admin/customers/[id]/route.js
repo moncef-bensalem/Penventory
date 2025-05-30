@@ -8,8 +8,8 @@ const globalForPrisma = global;
 globalForPrisma.prisma = globalForPrisma.prisma || new PrismaClient();
 const prisma = globalForPrisma.prisma;
 
-export async function GET(request, { params }) {
-  const { id } = params;
+export async function GET(request, context) {
+  const { id } = await context.params;
   
   console.log(`[ADMIN_CUSTOMER_GET] Fetching customer details for ID: ${id}`);
   

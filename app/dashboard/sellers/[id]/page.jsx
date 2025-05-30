@@ -275,7 +275,7 @@ export default function SellerDetails() {
           />
           <p className="text-gray-500 mb-4">Consulter et gérer les informations du vendeur</p>
           
-          <div className="mt-6 bg-white shadow-md rounded-lg p-6">
+          <div className="mt-6 bg-white dark:bg-gray-900 shadow-md rounded-lg p-6">
             <div className="flex flex-col items-center">
               <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4 text-center">
                 <h3 className="font-bold text-lg mb-2">Abonnement expiré</h3>
@@ -338,7 +338,7 @@ export default function SellerDetails() {
         </div>
       )}
 
-      <div className="mt-6 bg-white shadow-md rounded-lg p-6">
+      <div className="mt-6 bg-white dark:bg-gray-900 shadow-md rounded-lg p-6">
         {/* En-tête avec statut et actions */}
         <div className="flex justify-between items-center mb-6 pb-4 border-b">
           <div>
@@ -399,63 +399,63 @@ export default function SellerDetails() {
         {/* Informations principales */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Informations personnelles */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Informations personnelles</h3>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4 dark:text-white">Informations personnelles</h3>
             
             <div className="space-y-3">
               <div className="flex items-center">
                 <User className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="font-medium mr-2">Nom complet:</span>
+                <span className="font-medium mr-2 dark:text-gray-200">Nom complet:</span>
                 <span>{sellerName}</span>
               </div>
               
               <div className="flex items-center">
                 <Mail className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="font-medium mr-2">Email:</span>
+                <span className="font-medium mr-2 dark:text-gray-200">Email:</span>
                 <span>{seller.email}</span>
               </div>
               
               <div className="flex items-center">
                 <Phone className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="font-medium mr-2">Téléphone:</span>
+                <span className="font-medium mr-2 dark:text-gray-200">Téléphone:</span>
                 <span>{seller.phone || "Non renseigné"}</span>
               </div>
               
               <div className="flex items-center">
                 <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                <span className="font-medium mr-2">Inscrit le:</span>
+                <span className="font-medium mr-2 dark:text-gray-200">Inscrit le:</span>
                 <span>{formatDate(seller.createdAt)}</span>
               </div>
             </div>
           </div>
 
           {/* Informations de la boutique */}
-          <div className="bg-gray-50 p-4 rounded-lg">
-            <h3 className="text-lg font-semibold mb-4">Informations de la boutique</h3>
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+            <h3 className="text-lg font-semibold mb-4 dark:text-white">Informations de la boutique</h3>
             
             {seller.store ? (
               <div className="space-y-3">
                 <div className="flex items-center">
                   <Store className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Nom de la boutique:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Nom de la boutique:</span>
                   <span>{seller.store.name}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <ShoppingBag className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Nombre de produits:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Nombre de produits:</span>
                   <span>{seller.store.productsCount || seller.store.productCount || 0}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <DollarSign className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Chiffre d'affaires:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Chiffre d'affaires:</span>
                   <span>{formatPrice(seller.store.revenue || 0)}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Créée le:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Créée le:</span>
                   <span>{formatDate(seller.store.createdAt)}</span>
                 </div>
               </div>
@@ -465,9 +465,9 @@ export default function SellerDetails() {
           </div>
 
           {/* Informations d'abonnement courant */}
-          <div className="bg-gray-50 p-4 rounded-lg md:col-span-2">
+          <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg md:col-span-2">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Informations d'abonnement</h3>
+              <h3 className="text-lg font-semibold dark:text-white">Informations d'abonnement</h3>
               {isExpired && latestSubscription && (
                 <span className="flex items-center text-red-600 bg-red-50 px-2 py-1 rounded">
                   <AlertOctagon className="h-4 w-4 mr-1" />
@@ -480,19 +480,19 @@ export default function SellerDetails() {
               <div className="space-y-3">
                 <div className="flex items-center">
                   <CreditCard className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Type d'abonnement:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Type d'abonnement:</span>
                   <span className="capitalize">{latestSubscription.type}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Date de début:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Date de début:</span>
                   <span>{formatDate(latestSubscription.createdAt)}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <Calendar className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Date d'expiration:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Date d'expiration:</span>
                   <span className={isExpired ? "text-red-600 font-medium" : ""}>
                     {formatDate(latestSubscription.expiresAt)}
                   </span>
@@ -506,13 +506,13 @@ export default function SellerDetails() {
                 
                 <div className="flex items-center">
                   <DollarSign className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Montant payé:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Montant payé:</span>
                   <span>{formatPrice(latestSubscription.amount || 0)}</span>
                 </div>
                 
                 <div className="flex items-center">
                   <CreditCard className="h-5 w-5 text-gray-500 mr-2" />
-                  <span className="font-medium mr-2">Statut:</span>
+                  <span className="font-medium mr-2 dark:text-gray-200">Statut:</span>
                   <span className={`px-2 py-1 rounded text-xs font-medium ${
                     latestSubscription.status === 'ACTIVE' && !isExpired ? 'bg-green-100 text-green-800' :
                     latestSubscription.status === 'EXPIRED' || isExpired ? 'bg-red-100 text-red-800' :
@@ -529,18 +529,18 @@ export default function SellerDetails() {
 
           {/* Historique des abonnements */}
           {subscriptionHistory.length > 1 && (
-            <div className="bg-gray-50 p-4 rounded-lg md:col-span-2 mt-4">
-              <h3 className="text-lg font-semibold mb-4">Historique des abonnements</h3>
+            <div className="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg md:col-span-2 mt-4">
+              <h3 className="text-lg font-semibold mb-4 dark:text-white">Historique des abonnements</h3>
               
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-100">
+                  <thead className="bg-gray-100 dark:bg-gray-900">
                     <tr>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date début</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date expiration</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Type</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date début</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Date expiration</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Montant</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Statut</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
@@ -548,15 +548,15 @@ export default function SellerDetails() {
                       const subExpired = isDateExpired(sub.expiresAt);
                       return (
                         <tr key={index}>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm">{sub.type}</td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm">{formatDate(sub.createdAt)}</td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm">
+                          <td className="px-4 py-2 whitespace-nowrap text-sm dark:text-gray-200">{sub.type}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm dark:text-gray-200">{formatDate(sub.createdAt)}</td>
+                          <td className="px-4 py-2 whitespace-nowrap text-sm dark:text-gray-200">
                             <span className={subExpired ? "text-red-600" : ""}>
                               {formatDate(sub.expiresAt)}
                             </span>
                           </td>
-                          <td className="px-4 py-2 whitespace-nowrap text-sm">{formatPrice(sub.amount || 0)}</td>
-                          <td className="px-4 py-2 whitespace-nowrap">
+                          <td className="px-4 py-2 whitespace-nowrap text-sm dark:text-gray-200">{formatPrice(sub.amount || 0)}</td>
+                          <td className="px-4 py-2 whitespace-nowrap dark:text-gray-200">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
                               sub.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
                               sub.status === 'EXPIRED' ? 'bg-red-100 text-red-800' :

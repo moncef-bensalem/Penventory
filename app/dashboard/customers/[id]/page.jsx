@@ -124,8 +124,36 @@ export default function CustomerDetailsPage() {
     }
   };
 
-  const handleExportPDF = () => {
-    toast('Export PDF en cours de développement', { icon: '📄', duration: 3000 });
+  const handleExportPDF = async () => {
+    if (!customer) return;
+    const { default: jsPDF } = await import('jspdf');
+    const autoTable = (await import('jspdf-autotable')).default;
+    const doc = new jsPDF();
+    doc.setFontSize(18);
+    doc.text('Détails du client', 14, 18);
+    doc.setFontSize(12);
+    doc.text(`Nom: ${customer.name || ''}`, 14, 30);
+    doc.text(`Email: ${customer.email || ''}`, 14, 38);
+    doc.text(`Téléphone: ${customer.phone || ''}`, 14, 46);
+    doc.text(`Date d'inscription: ${formatDate(customer.createdAt)}`, 14, 54);
+    doc.text('Historique des commandes :', 14, 66);
+    const tableColumn = ['Numéro', 'Date', 'Statut', 'Paiement', 'Total'];
+    const tableRows = (customer.orders || []).map(order => [
+      order.number || order.id,
+      formatDate(order.createdAt),
+      order.statusLabel || order.status,
+      getPaymentStatusLabel(order.paymentStatus),
+      formatPrice(order.total)
+    ]);
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 72,
+      styles: { fontSize: 10 },
+      headStyles: { fillColor: [255, 140, 0] },
+      margin: { left: 14, right: 14 }
+    });
+    doc.save(`client_${customer.id}.pdf`);
   };
 
   if (loading || authLoading) {
