@@ -6,6 +6,53 @@ import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { Star, Truck, ShieldCheck, ArrowLeft, ShoppingCart, Heart, Share2, ChevronRight } from 'lucide-react';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { X } from 'lucide-react';
+
+// Composant d'alerte personnalisé pour l'ajout au panier
+function CartAlert({ onClose, onViewCart, onContinueShopping }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity duration-300">
+      <div className="relative w-full max-w-md p-6 mx-auto rounded-xl shadow-xl bg-white border border-gray-200 transition-all duration-300">
+        {/* Effet de brillance */}
+        <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+          <div className="absolute -inset-x-40 -inset-y-40 bg-gradient-to-r from-transparent via-orange-50/10 to-transparent transform rotate-45 animate-shimmer"></div>
+        </div>
+        
+        {/* Bouton de fermeture */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200 transition-colors"
+        >
+          <X className="h-5 w-5 text-gray-500" />
+        </button>
+        
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-full bg-green-50 text-green-500">
+            <ShoppingCart className="h-6 w-6" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Produit ajouté au panier</h3>
+        </div>
+        
+        <p className="mt-4 text-gray-700">Votre produit a été ajouté au panier avec succès!</p>
+        
+        <div className="mt-6 flex justify-center gap-4">
+          <button
+            onClick={onContinueShopping}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+          >
+            Continuer mes achats
+          </button>
+          <button
+            onClick={onViewCart}
+            className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+          >
+             Voir le panier
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ProductDetailPage() {
   const params = useParams();
@@ -19,6 +66,7 @@ export default function ProductDetailPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [showCartAlert, setShowCartAlert] = useState(false);
   const { openConfirmation, ConfirmationDialog } = useConfirmation();
   
   // Fonction pour générer une clé sécurisée
@@ -310,13 +358,8 @@ export default function ProductDetailPage() {
         // Déclencher un événement pour mettre à jour le compteur du panier
         window.dispatchEvent(new Event('storage'));
         
-        // Afficher une confirmation de succès
-        openConfirmation({
-          title: "Succès",
-          message: "Produit ajouté au panier avec succès!",
-          confirmText: "OK",
-          type: "success"
-        });
+        // Afficher l'alerte personnalisée avec les deux options
+        setShowCartAlert(true);
       }
     });
   };
@@ -422,13 +465,8 @@ export default function ProductDetailPage() {
           // Déclencher un événement pour mettre à jour le compteur du panier
           window.dispatchEvent(new Event('storage'));
           
-          // Afficher une confirmation de succès
-          openConfirmation({
-            title: "Succès",
-            message: "Produit ajouté au panier avec succès!",
-            confirmText: "OK",
-            type: "success"
-          });
+          // Afficher l'alerte personnalisée avec les deux options
+          setShowCartAlert(true);
         }
       });
     } catch (error) {
@@ -1083,6 +1121,21 @@ export default function ProductDetailPage() {
         </div>
       )}
       <ConfirmationDialog />
+      
+      {/* Alerte personnalisée pour l'ajout au panier */}
+      {showCartAlert && (
+        <CartAlert 
+          onClose={() => setShowCartAlert(false)}
+          onViewCart={() => {
+            setShowCartAlert(false);
+            router.push('/cart');
+          }}
+          onContinueShopping={() => {
+            setShowCartAlert(false);
+            router.push('/products');
+          }}
+        />
+      )}
     </div>
   );
 }

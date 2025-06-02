@@ -13,7 +13,7 @@ const translations = {
     account: 'Compte',
     dashboard: 'Tableau de bord',
     orders: 'Commandes',
-    sellers: 'Vendeurs',
+    OurStore: 'Nos magasins',
     customers: 'Clients',
     settings: 'Paramètres',
     logout: 'Déconnexion',

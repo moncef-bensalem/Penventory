@@ -114,7 +114,7 @@ function StoreLayoutContent({ children }) {
                 {t('categories')}
               </Link>
               <Link href="/store" className={`text-sm font-medium ${pathname.startsWith('/store') ? 'text-orange-600' : 'text-gray-700 hover:text-orange-600'} transition-colors`}>
-                {t('sellers')}
+                {t('OurStore')}
               </Link>
               <Link href="/contact" className={`text-sm font-medium ${pathname.startsWith('/contact') ? 'text-orange-600' : 'text-gray-700 hover:text-orange-600'} transition-colors`}>
                 {t('contact')}
