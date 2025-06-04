@@ -1,6 +1,6 @@
-'use client';
+  'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/context/auth-context';
 import { useLanguage } from '@/context/language-context';
 import { 
@@ -13,7 +13,8 @@ import {
   HelpCircle,
   Package,
   CreditCard,
-  User
+  User,
+  Shield
 } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
@@ -45,14 +46,31 @@ export default function ContactPage() {
     name: user ? user.name : '',
     email: user ? user.email : '',
     subject: '',
-    category: 'OTHER',
-    priority: 'MEDIUM',
+    category: '', // Catégorie optionnelle maintenant
+    priority: '', // Priorité optionnelle maintenant
     message: '',
     orderNumber: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [ticketId, setTicketId] = useState('');
+  const [captchaValue, setCaptchaValue] = useState('');
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  const [captchaError, setCaptchaError] = useState(false);
+  const captchaRef = useRef(null);
+  
+  // Générer un nouveau CAPTCHA
+  const generateCaptcha = () => {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    setCaptchaAnswer((num1 + num2).toString());
+    return `${num1} + ${num2}`;
+  };
+  
+  // Initialiser le CAPTCHA au chargement de la page
+  useEffect(() => {
+    setCaptchaValue(generateCaptcha());
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -64,6 +82,18 @@ export default function ContactPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Vérifier le CAPTCHA
+    if (captchaRef.current.value !== captchaAnswer) {
+      setCaptchaError(true);
+      // Générer un nouveau CAPTCHA
+      setCaptchaValue(generateCaptcha());
+      captchaRef.current.value = '';
+      toast.error(t('captchaError') || 'Le code de sécurité est incorrect');
+      return;
+    }
+    
+    setCaptchaError(false);
     setIsSubmitting(true);
 
     try {
@@ -71,8 +101,9 @@ export default function ContactPage() {
       const ticketData = {
         subject: formData.subject,
         description: formData.message,
-        category: formData.category,
-        priority: formData.priority,
+        // Utiliser des valeurs par défaut si les champs sont vides
+        category: formData.category || 'OTHER',
+        priority: formData.priority || 'MEDIUM',
         orderNumber: formData.orderNumber || undefined
       };
       
@@ -109,6 +140,9 @@ export default function ContactPage() {
       }
     } finally {
       setIsSubmitting(false);
+      // Générer un nouveau CAPTCHA
+      setCaptchaValue(generateCaptcha());
+      if (captchaRef.current) captchaRef.current.value = '';
     }
   };
 
@@ -117,13 +151,16 @@ export default function ContactPage() {
       name: user ? user.name : '',
       email: user ? user.email : '',
       subject: '',
-      category: 'OTHER',
-      priority: 'MEDIUM',
+      category: '',
+      priority: '',
       message: '',
       orderNumber: ''
     });
     setSubmitted(false);
     setTicketId('');
+    setCaptchaValue(generateCaptcha());
+    setCaptchaError(false);
+    if (captchaRef.current) captchaRef.current.value = '';
   };
 
   return (
@@ -249,45 +286,49 @@ export default function ContactPage() {
                       />
                     </div>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Catégorie et Priorité (optionnels) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                          {t('categoryLabel')} <span className="text-red-500">*</span>
+                        <label className="block text-gray-900 font-medium mb-2 dark:text-gray-300">
+                          {t('categoryLabel')} ({t('optional') || 'Optionnel'}):
                         </label>
-                        <select
-                          id="category"
-                          name="category"
-                          value={formData.category}
-                          onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
-                          required
-                        >
-                          {supportCategories.map(category => (
-                            <option key={category.id} value={category.id}>
-                              {category.label}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="relative">
+                          <select
+                            name="category"
+                            value={formData.category}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          >
+                            <option value="">{t('selectCategory') || 'Sélectionner une catégorie'}</option>
+                            {supportCategories.map(category => (
+                              <option key={category.id} value={category.id}>
+                                {category.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                       
+                      {/* Priorité */}
                       <div>
-                        <label htmlFor="priority" className="block text-sm font-medium text-gray-700 mb-1 dark:text-gray-200">
-                          {t('priorityLabel')} <span className="text-red-500">*</span>
+                        <label className="block text-gray-900 font-medium mb-2 dark:text-gray-300">
+                          {t('priorityLabel')} ({t('optional') || 'Optionnel'}):
                         </label>
-                        <select
-                          id="priority"
-                          name="priority"
-                          value={formData.priority}
-                          onChange={handleChange}
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
-                          required
-                        >
-                          {supportPriorities.map(priority => (
-                            <option key={priority.id} value={priority.id}>
-                              {priority.label}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="relative">
+                          <select
+                            name="priority"
+                            value={formData.priority}
+                            onChange={handleChange}
+                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                          >
+                            <option value="">{t('selectPriority') || 'Sélectionner une priorité'}</option>
+                            {supportPriorities.map(priority => (
+                              <option key={priority.id} value={priority.id}>
+                                {priority.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
                     </div>
                     
@@ -304,6 +345,49 @@ export default function ContactPage() {
                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-white dark:border-gray-700"
                         required
                       ></textarea>
+                    </div>
+                    
+                    {/* CAPTCHA */}
+                    <div className="mb-4">
+                      <label className="block text-gray-900 font-medium mb-2 dark:text-gray-300">
+                        <div className="flex items-center">
+                          <Shield className="h-5 w-5 mr-2 text-orange-600" />
+                          {t('securityCode') || 'Code de sécurité'} <span className="text-red-500">*</span>
+                        </div>
+                      </label>
+                      <div className="flex items-center space-x-4">
+                        <div className="bg-gray-100 dark:bg-gray-700 p-3 rounded-md font-mono font-bold text-lg min-w-[100px] text-center">
+                          {captchaValue}
+                        </div>
+                        <input
+                          type="text"
+                          ref={captchaRef}
+                          placeholder={t('enterResult') || 'Entrez le résultat'}
+                          className={`flex-1 p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent dark:bg-gray-700 dark:border-gray-600 dark:text-white ${captchaError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300'}`}
+                          required
+                        />
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            setCaptchaValue(generateCaptcha());
+                            if (captchaRef.current) captchaRef.current.value = '';
+                          }}
+                          className="p-2 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                          title={t('refreshCaptcha') || 'Actualiser le code'}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                        </button>
+                      </div>
+                      {captchaError && (
+                        <p className="mt-1 text-sm text-red-500">
+                          {t('captchaError') || 'Le code de sécurité est incorrect'}
+                        </p>
+                      )}
+                      <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                        {t('captchaHelp') || 'Cette vérification nous aide à protéger notre site contre les robots spammeurs.'}
+                      </p>
                     </div>
                     
                     <div>

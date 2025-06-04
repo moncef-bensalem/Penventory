@@ -241,6 +241,25 @@ export default function CartPage() {
       return;
     }
     
+    // Vérifier si l'utilisateur est connecté
+    const isLoggedIn = localStorage.getItem('user') || sessionStorage.getItem('session');
+    
+    if (!isLoggedIn) {
+      openConfirmation({
+        title: "Connexion requise",
+        message: "Vous devez vous connecter ou créer un compte pour finaliser votre commande.",
+        confirmText: "Se connecter",
+        cancelText: "Annuler",
+        type: "info",
+        onConfirm: () => {
+          // Sauvegarder l'URL de retour pour revenir au panier après connexion
+          localStorage.setItem('returnUrl', '/cart');
+          router.push('/register/client');
+        }
+      });
+      return;
+    }
+    
     // Sauvegarder les informations de réduction du coupon dans localStorage
     if (couponApplied) {
       localStorage.setItem('couponDiscount', couponDiscount.toString());

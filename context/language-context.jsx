@@ -36,6 +36,17 @@ const translations = {
     sellerSpace: 'Espace vendeur',
     easyReturn: 'RETOUR FACILE',
     quickReturns: 'Retours et remboursements rapides',
+    discoverStores: 'Découvrez nos boutiques partenaires',
+    
+    // Contact page
+    optional: 'Optionnel',
+    selectCategory: 'Sélectionner une catégorie',
+    selectPriority: 'Sélectionner une priorité',
+    securityCode: 'Code de sécurité',
+    enterResult: 'Entrez le résultat',
+    refreshCaptcha: 'Actualiser le code',
+    captchaError: 'Le code de sécurité est incorrect',
+    captchaHelp: 'Cette vérification nous aide à protéger notre site contre les robots spammeurs',
     
     // Actions
     search: 'Rechercher',
@@ -153,11 +164,13 @@ const translations = {
     helpCenter: 'Centre d\'aide',
     liveChat: 'Chat en direct',
     
-    // Help Page
-    helpPageTitle: 'Centre d\'assistance',
-    helpPageSubtitle: 'Comment pouvons-nous vous aider aujourd\'hui?',
-    searchPlaceholder: 'Tapez des mots-clés comme « retour »',
+    // Page d'aide
+    helpPageTitle: 'Centre d\'aide',
+    helpPageSubtitle: 'Comment pouvons-nous vous aider aujourd\'hui ?',
+    searchPlaceholder: 'Rechercher une question ou un mot-clé',
     searchButton: 'Rechercher',
+    searching: 'Recherche...',
+    searchResults: 'Résultats pour',
     helpCategory1Title: 'Passer une commande',
     helpCategory1Description: 'Tout ce que vous devez savoir pour passer une commande sur notre plateforme.',
     helpCategory2Title: 'Suivre votre colis',

@@ -113,6 +113,8 @@ export default function HelpPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedCategory, setExpandedCategory] = useState(null);
   const [expandedQuestions, setExpandedQuestions] = useState({});
+  const [searchResults, setSearchResults] = useState([]);
+  const [isSearching, setIsSearching] = useState(false);
   const { t } = useLanguage();
   
   // Utiliser les fonctions pour obtenir les données traduites
@@ -121,7 +123,48 @@ export default function HelpPage() {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    // Logique de recherche à implémenter
+    setIsSearching(true);
+    
+    // Réinitialiser les résultats précédents
+    setSearchResults([]);
+    
+    if (!searchQuery.trim()) {
+      setIsSearching(false);
+      return;
+    }
+    
+    // Rechercher dans toutes les catégories et questions
+    const results = [];
+    
+    Object.entries(faqByCategory).forEach(([categoryId, questions]) => {
+      const categoryName = helpCategories.find(cat => cat.id === categoryId)?.title || categoryId;
+      
+      questions.forEach((faq, index) => {
+        // Vérifier si la question ou la réponse contient le terme de recherche
+        const questionLower = faq.question.toLowerCase();
+        const answerLower = faq.answer.toLowerCase();
+        const searchLower = searchQuery.toLowerCase();
+        
+        if (questionLower.includes(searchLower) || answerLower.includes(searchLower)) {
+          results.push({
+            categoryId,
+            categoryName,
+            questionIndex: index,
+            question: faq.question,
+            answer: faq.answer,
+            // Calculer un score simple basé sur le nombre d'occurrences
+            score: (questionLower.split(searchLower).length - 1) * 2 + 
+                   (answerLower.split(searchLower).length - 1)
+          });
+        }
+      });
+    });
+    
+    // Trier les résultats par score (du plus élevé au plus bas)
+    results.sort((a, b) => b.score - a.score);
+    
+    setSearchResults(results);
+    setIsSearching(false);
   };
 
   const toggleCategory = (categoryId) => {
@@ -149,16 +192,17 @@ export default function HelpPage() {
               <input
                 type="text"
                 placeholder={t('searchPlaceholder')}
+                className="w-full pl-12 pr-32 py-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-400 shadow-md"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full p-4 pl-12 pr-4 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-500 bg-white text-gray-900 dark:bg-gray-800 dark:text-white dark:border-gray-700"
               />
               <Search className="absolute left-4 top-4 text-gray-400" />
               <button
                 type="submit"
                 className="absolute right-2 top-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors"
+                disabled={isSearching}
               >
-                {t('searchButton')}
+                {isSearching ? t('searching') || 'Recherche...' : t('searchButton')}
               </button>
             </form>
           </div>
@@ -181,8 +225,40 @@ export default function HelpPage() {
           ))}
         </div>
 
+        {/* Résultats de recherche */}
+        {searchResults.length > 0 && (
+          <div className="bg-white rounded-lg shadow-sm p-6 mb-12 dark:bg-gray-800">
+            <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
+              {t('searchResults')} "{searchQuery}" ({searchResults.length})
+            </h2>
+            <div className="space-y-4">
+              {searchResults.map((result, resultIndex) => (
+                <div key={resultIndex} className="border-b pb-4 border-gray-200 dark:border-gray-700">
+                  <div className="text-sm text-orange-500 mb-1">{result.categoryName}</div>
+                  <button
+                    className="w-full text-left flex justify-between items-center py-2"
+                    onClick={() => toggleQuestion(`search_${resultIndex}`)}
+                  >
+                    <span className="font-medium text-lg text-gray-900 dark:text-white">{result.question}</span>
+                    {expandedQuestions[`search_${resultIndex}`] ? (
+                      <ChevronUp className="h-5 w-5 text-orange-500" />
+                    ) : (
+                      <ChevronDown className="h-5 w-5 text-orange-500" />
+                    )}
+                  </button>
+                  {expandedQuestions[`search_${resultIndex}`] && (
+                    <div className="mt-2 text-gray-600 whitespace-pre-line dark:text-gray-300">
+                      {result.answer}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        
         {/* FAQ Section */}
-        {expandedCategory && (
+        {expandedCategory && searchResults.length === 0 && (
           <div className="bg-white rounded-lg shadow-sm p-6 mb-12 dark:bg-gray-800">
             <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">
               {helpCategories.find(cat => cat.id === expandedCategory)?.title}

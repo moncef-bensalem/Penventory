@@ -2,12 +2,59 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Loader2, Search, ShoppingCart, Filter, School } from "lucide-react";
+import { Loader2, Search, ShoppingCart, Filter, School, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useConfirmation } from "@/hooks/use-confirmation";
+
+// Composant d'alerte personnalisé pour l'ajout au panier
+function CartAlert({ onClose, onViewCart, onContinueShopping }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity duration-300">
+      <div className="relative w-full max-w-md p-6 mx-auto rounded-xl shadow-xl bg-white border border-gray-200 transition-all duration-300">
+        {/* Effet de brillance */}
+        <div className="absolute inset-0 overflow-hidden rounded-xl pointer-events-none">
+          <div className="absolute -inset-x-40 -inset-y-40 bg-gradient-to-r from-transparent via-orange-50/10 to-transparent transform rotate-45 animate-shimmer"></div>
+        </div>
+        
+        {/* Bouton de fermeture */}
+        <button 
+          onClick={onClose} 
+          className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-200 transition-colors"
+        >
+          <X className="h-5 w-5 text-gray-500" />
+        </button>
+        
+        <div className="flex items-center gap-4">
+          <div className="p-3 rounded-full bg-green-50 text-green-500">
+            <ShoppingCart className="h-6 w-6" />
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900">Liste ajoutée au panier</h3>
+        </div>
+        
+        <p className="mt-4 text-gray-700">Les articles de la liste scolaire ont été ajoutés au panier avec succès!</p>
+        
+        <div className="mt-6 flex justify-center gap-4">
+          <button
+            onClick={onContinueShopping}
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+          >
+            Continuer mes achats
+          </button>
+          <button
+            onClick={onViewCart}
+            className="px-4 py-2 text-sm font-medium text-white bg-orange-500 hover:bg-orange-600 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition-colors"
+          >
+             Voir le panier
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function ListesScolairesPage() {
   const router = useRouter();
@@ -19,6 +66,8 @@ export default function ListesScolairesPage() {
   const [filterEtablissement, setFilterEtablissement] = useState("");
   const [niveaux, setNiveaux] = useState([]);
   const [etablissements, setEtablissements] = useState([]);
+  const [showCartAlert, setShowCartAlert] = useState(false);
+  const { openConfirmation, ConfirmationDialog } = useConfirmation();
 
   useEffect(() => {
     fetchListes();
@@ -77,8 +126,96 @@ export default function ListesScolairesPage() {
     router.push(`/listes-scolaires/${id}`);
   };
 
-  const handleAddToCart = (id) => {
-    router.push(`/listes-scolaires/${id}/add-to-cart`);
+  const handleAddToCart = async (id) => {
+    try {
+      // Récupérer les détails de la liste scolaire
+      const res = await fetch(`/api/listes-scolaires/${id}`);
+      if (!res.ok) {
+        throw new Error("Erreur lors de la récupération des détails de la liste scolaire");
+      }
+      
+      const liste = await res.json();
+      
+      // Vérifier si la liste a des besoins
+      if (!liste.besoins || liste.besoins.length === 0) {
+        openConfirmation({
+          title: "Liste vide",
+          message: "Cette liste scolaire ne contient aucun article à ajouter au panier.",
+          confirmText: "OK",
+          type: "warning"
+        });
+        return;
+      }
+      
+      // Demander confirmation avant d'ajouter au panier
+      openConfirmation({
+        title: "Ajouter la liste au panier",
+        message: `Voulez-vous ajouter les ${liste.besoins.length} articles de la liste "${liste.titre || liste.nom}" au panier ?`,
+        confirmText: "Ajouter au panier",
+        cancelText: "Annuler",
+        type: "info",
+        onConfirm: () => {
+          // Récupérer le panier actuel du localStorage
+          const currentCart = JSON.parse(localStorage.getItem('cart') || '[]');
+          
+          // Pour chaque besoin dans la liste, ajouter un produit générique au panier
+          liste.besoins.forEach(besoin => {
+            // Créer un produit générique basé sur le besoin
+            // Vérifier si le besoin a des produits associés avec un prix
+            let defaultPrice = 5; // Prix par défaut en DT si aucun produit associé n'est trouvé
+            
+            // Si le besoin a des produits associés, utiliser le prix du premier produit validé
+            if (besoin.produitAssociations && besoin.produitAssociations.length > 0) {
+              const validatedAssociations = besoin.produitAssociations.filter(assoc => assoc.validated);
+              if (validatedAssociations.length > 0) {
+                defaultPrice = validatedAssociations[0].prix || defaultPrice;
+              }
+            }
+            
+            const listeProduct = {
+              id: `liste-${liste.id}-besoin-${besoin.id}`,
+              name: besoin.nomProduit,
+              price: defaultPrice, // Utiliser un prix par défaut ou le prix du produit associé
+              quantity: besoin.quantite || 1,
+              isListeItem: true,
+              listeId: liste.id,
+              besoinId: besoin.id,
+              details: besoin.details || ""
+            };
+            
+            // Vérifier si ce produit de liste est déjà dans le panier
+            const existingIndex = currentCart.findIndex(item => 
+              item.isListeItem && item.listeId === liste.id && item.besoinId === besoin.id
+            );
+            
+            if (existingIndex >= 0) {
+              // Si le produit existe déjà, augmenter la quantité
+              currentCart[existingIndex].quantity += besoin.quantite || 1;
+            } else {
+              // Sinon, ajouter le nouveau produit
+              currentCart.push(listeProduct);
+            }
+          });
+          
+          // Sauvegarder le panier mis à jour
+          localStorage.setItem('cart', JSON.stringify(currentCart));
+          
+          // Déclencher un événement pour mettre à jour le compteur du panier
+          window.dispatchEvent(new Event('storage'));
+          
+          // Afficher l'alerte personnalisée
+          setShowCartAlert(true);
+        }
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'ajout de la liste au panier:", error);
+      openConfirmation({
+        title: "Erreur",
+        message: "Une erreur est survenue lors de l'ajout de la liste au panier.",
+        confirmText: "OK",
+        type: "danger"
+      });
+    }
   };
 
   const resetFilters = () => {
@@ -211,6 +348,21 @@ export default function ListesScolairesPage() {
             </Card>
           ))}
         </div>
+      )}
+      <ConfirmationDialog />
+      
+      {/* Alerte personnalisée pour l'ajout au panier */}
+      {showCartAlert && (
+        <CartAlert 
+          onClose={() => setShowCartAlert(false)}
+          onViewCart={() => {
+            setShowCartAlert(false);
+            router.push('/cart');
+          }}
+          onContinueShopping={() => {
+            setShowCartAlert(false);
+          }}
+        />
       )}
     </div>
   );

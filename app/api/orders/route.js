@@ -10,11 +10,19 @@ export async function POST(req) {
   try {
     console.log('Orders API - Creating new order...');
     
-    // Vérifier l'authentification (optionnel)
+    // Vérifier l'authentification (obligatoire)
     const session = await getServerSession(authOptions);
     const userId = session?.user?.id;
     
     console.log('User from session:', userId ? `ID: ${userId}` : 'Not authenticated');
+    
+    // Refuser la commande si l'utilisateur n'est pas authentifié
+    if (!userId) {
+      console.log('Authentication required: User not logged in');
+      return NextResponse.json({ 
+        error: "Authentification requise. Veuillez vous connecter ou créer un compte pour finaliser votre commande." 
+      }, { status: 401 });
+    }
     
     // Récupérer les données de la commande
     const data = await req.json();
@@ -107,38 +115,11 @@ export async function POST(req) {
       
       console.log(`Creating order for store ${storeId}, number: ${orderNumber}, items: ${storeItems.length}`);
       
-      // Vérifier si un utilisateur avec cet email existe déjà
+      // Utiliser l'ID de l'utilisateur connecté
       let customerId = userId;
       
-      if (!userId && customerInfo && customerInfo.email) {
-        const existingUser = await prisma.user.findUnique({
-          where: { email: customerInfo.email }
-        });
-        
-        if (existingUser) {
-          customerId = existingUser.id;
-          console.log(`Found existing user with email ${customerInfo.email}, ID: ${customerId}`);
-        } else if (customerInfo.email) {
-          // Créer un nouvel utilisateur
-          try {
-            const newUser = await prisma.user.create({
-              data: {
-                name: customerInfo.name,
-                email: customerInfo.email,
-                role: "CUSTOMER",
-                createdAt: new Date(),
-                updatedAt: new Date()
-              }
-            });
-            customerId = newUser.id;
-            console.log(`Created new user with email ${customerInfo.email}, ID: ${customerId}`);
-          } catch (userError) {
-            console.error(`Error creating user: ${userError.message}`);
-            // Si la création échoue, continuer sans utilisateur
-            customerId = null;
-          }
-        }
-      }
+      // L'utilisateur doit être connecté pour passer une commande
+      console.log(`Using authenticated user ID: ${customerId}`);
       
       // Créer la commande
       try {
@@ -167,12 +148,11 @@ export async function POST(req) {
           updatedAt: new Date()
         };
         
-        // Ajouter la relation avec l'utilisateur seulement si on a un ID
-        if (customerId) {
-          orderData.customer = {
-            connect: { id: customerId }
-          };
-        }
+        // Ajouter la relation avec l'utilisateur (obligatoire)
+        // L'utilisateur doit être connecté pour passer une commande
+        orderData.customer = {
+          connect: { id: customerId }
+        };
         
         const order = await prisma.order.create({
           data: orderData,
