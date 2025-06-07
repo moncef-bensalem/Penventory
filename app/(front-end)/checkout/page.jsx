@@ -5,9 +5,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronRight, CreditCard, Truck, ShieldCheck, X, CreditCard as CardIcon, Banknote } from 'lucide-react';
+import { useAuth } from '@/context/auth-context';
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [couponApplied, setCouponApplied] = useState(false);
@@ -84,12 +86,22 @@ export default function CheckoutPage() {
     loadCart();
   }, []);
   
-  // Rediriger vers le panier si vide
+  // Vérifier l'authentification et rediriger vers le panier si vide
   useEffect(() => {
-    if (!loading && cartItems.length === 0) {
-      router.push('/cart');
+    if (!loading) {
+      // Si l'utilisateur n'est pas authentifié, rediriger vers la page de connexion
+      if (!authLoading && !user) {
+        localStorage.setItem('returnUrl', '/cart');
+        router.push('/register/client');
+        return;
+      }
+      
+      // Si le panier est vide, rediriger vers la page du panier
+      if (cartItems.length === 0) {
+        router.push('/cart');
+      }
     }
-  }, [cartItems, loading, router]);
+  }, [cartItems, loading, router, user, authLoading]);
   
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;

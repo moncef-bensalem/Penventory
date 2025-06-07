@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { ShoppingCart, X, ChevronLeft, ChevronRight, Trash2, ShoppingBag, AlertCircle } from 'lucide-react';
 import ProductCard from '../components/ProductCard';
 import { useConfirmation } from '@/hooks/use-confirmation';
+import { useAuth } from '@/context/auth-context';
 
 export default function CartPage() {
   const router = useRouter();
@@ -17,6 +18,7 @@ export default function CartPage() {
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [promoStoreId, setPromoStoreId] = useState(null);
   const { openConfirmation, ConfirmationDialog } = useConfirmation();
+  const { user, loading: authLoading } = useAuth();
   
   // Récupérer les éléments du panier depuis le localStorage
   useEffect(() => {
@@ -241,10 +243,8 @@ export default function CartPage() {
       return;
     }
     
-    // Vérifier si l'utilisateur est connecté
-    const isLoggedIn = localStorage.getItem('user') || sessionStorage.getItem('session');
-    
-    if (!isLoggedIn) {
+    // Vérifier si l'utilisateur est connecté en utilisant le contexte d'authentification
+    if (!user) {
       openConfirmation({
         title: "Connexion requise",
         message: "Vous devez vous connecter ou créer un compte pour finaliser votre commande.",
@@ -254,7 +254,7 @@ export default function CartPage() {
         onConfirm: () => {
           // Sauvegarder l'URL de retour pour revenir au panier après connexion
           localStorage.setItem('returnUrl', '/cart');
-          router.push('/register/client');
+          router.push('/login');
         }
       });
       return;
