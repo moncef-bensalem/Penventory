@@ -202,26 +202,18 @@ export default function AssocierProduitsPage({ params }) {
                 </div>
               </div>
               
-              {liste?.besoins && liste.besoins.length > 0 ? (
-                <div className="space-y-4">
-                  {liste.besoins.map(besoin => (
-                    <Card key={besoin.id} className="border border-gray-200 dark:border-gray-700">
-                      <CardHeader className="bg-gray-50 dark:bg-gray-800 py-3 px-4">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                          <div>
-                            <h3 className="font-medium text-gray-900 dark:text-gray-100">{besoin.libelle}</h3>
-                            <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
-                              {besoin.description || "Aucune description"}
-                            </p>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            {getBesoinStatusBadge(besoin.statut)}
-                            <Badge className="bg-purple-100 text-purple-800 hover:bg-purple-100">
-                              <Package className="h-3 w-3 mr-1" />
-                              Qté: {besoin.quantite}
-                            </Badge>
-                          </div>
+              {liste?.besoins?.length > 0 ? (
+                <div className="space-y-6">
+                  {liste.besoins.map((besoin) => (
+                    <Card key={besoin.id} className="overflow-hidden">
+                      <CardHeader className="bg-gray-50 dark:bg-gray-800 p-4">
+                        <div className="flex items-center justify-between">
+                          <CardTitle className="text-lg font-medium">{besoin.nomProduit || "Produit sans nom"}</CardTitle>
+                          {getBesoinStatusBadge(besoin.statut)}
                         </div>
+                        <CardDescription className="mt-2 p-2 bg-white dark:bg-gray-700 rounded border text-sm">
+                          <strong>Description du besoin:</strong> {besoin.description || "Aucune description fournie pour ce besoin"}
+                        </CardDescription>
                       </CardHeader>
                       <CardContent className="p-4">
                         <div className="grid gap-4 md:grid-cols-12">
@@ -243,6 +235,22 @@ export default function AssocierProduitsPage({ params }) {
                                 )) : <SelectItem value="loading">Chargement des produits...</SelectItem>}
                               </SelectContent>
                             </Select>
+                            
+                            {/* Afficher le nom et la description du produit sélectionné */}
+                            {associations[besoin.id]?.produitId && associations[besoin.id]?.produitId !== "no-product" && (
+                              <div className="mt-2 p-2 bg-gray-50 dark:bg-gray-800 rounded border">
+                                {produits.find(p => p.id === associations[besoin.id]?.produitId) ? (
+                                  <>
+                                    <p className="font-medium">{produits.find(p => p.id === associations[besoin.id]?.produitId)?.name}</p>
+                                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                                      {produits.find(p => p.id === associations[besoin.id]?.produitId)?.description || "Aucune description"}
+                                    </p>
+                                  </>
+                                ) : (
+                                  <p className="text-sm text-gray-500">Informations du produit non disponibles</p>
+                                )}
+                              </div>
+                            )}
                           </div>
                           
                           <div className="md:col-span-3 space-y-2">

@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 // Identifiants administrateur sécurisés
 // Ces valeurs peuvent être remplacées par des variables d'environnement
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@penventory.com';
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin@Penventory2025';
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'Admin12345';
 const ADMIN_NAME = process.env.ADMIN_NAME || 'Administrateur';
 
 async function createAdmin() {
