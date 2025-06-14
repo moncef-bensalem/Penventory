@@ -135,13 +135,9 @@ export default function CheckoutPage() {
       newErrors.email = 'Adresse email invalide';
     }
     
-    // Validation code postal selon le pays
-    if (formData.country === 'Tunisie') {
-      if (formData.postalCode && !/^\d{4}$/.test(formData.postalCode)) {
-        newErrors.postalCode = 'Code postal tunisien invalide (4 chiffres)';
-      }
-    } else if (formData.postalCode && !/^\d{5}$/.test(formData.postalCode)) {
-      newErrors.postalCode = 'Code postal invalide (5 chiffres)';
+    // Validation code postal - toujours 4 chiffres
+    if (formData.postalCode && !/^\d{4}$/.test(formData.postalCode)) {
+      newErrors.postalCode = 'Code postal invalide (4 chiffres)';
     }
     
     setErrors(newErrors);
@@ -412,7 +408,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="md:col-span-1">
                       <label htmlFor="city" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Ville *
+                        Pays *
                       </label>
                       <input
                         type="text"
@@ -430,7 +426,7 @@ export default function CheckoutPage() {
                     </div>
                     <div className="md:col-span-1">
                       <label htmlFor="country" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                        Pays *
+                        VILLE*
                       </label>
                       <select
                         id="country"
